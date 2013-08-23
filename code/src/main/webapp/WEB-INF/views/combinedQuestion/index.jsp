@@ -1,0 +1,95 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"  %>
+<%@ taglib prefix="r" tagdir="/WEB-INF/tags"%>
+<script type="text/javascript">var contextPath="<c:url value='/'/>"</script>
+<script src="<c:url value="/resources/js/jquery-1.8.2.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/resources/js/combinedQuestion/index.js"/>" type="text/javascript"></script>
+
+<r:layout  title="QuestionManager">
+<ul class="breadcrumb">
+  <li><r:a href="/">首页</r:a> <span class="divider">/</span></li>
+  <li class="active">试题管理</li>
+</ul>
+	<form action="<c:url value='/combinedQuestion' />" class="well form-search">
+		<c:import url="/plugin/search.jsp"></c:import>
+	</form>
+	
+	<div class="btn-group">
+          <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="icon-pencil icon-white"></i> 添加试题<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><r:a href="combinedQuestion/choice">添加单题</r:a></li>
+            <li><r:a href="combinedQuestion/combination">添加组合题</r:a></li>
+          </ul>
+        </div>
+        
+	<c:if test="${!empty questionList }">
+	<table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>题目</th>
+                    <th>类型</th>
+                    <th>难易度</th>
+                    <th>知识点</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <c:set var="index" value="${pageIndex.startRow}" />
+                <c:forEach var="question" items="${questionList}" varStatus="status">
+                    <tr>
+                        <td>${status.index + 1}</td>
+                        <td>
+
+                        <c:if test="${fn:length(question.content)>40}">
+                        <b>${fn:substring(question.content,0,40)}...</b>
+                        </c:if>
+                        <c:if test="${fn:length(question.content)<=40}">
+                        <b>${question.content }</b>
+                       </c:if>
+                       
+                        </td>
+                        <td>
+	                        <c:if test="${question.type == 'MULTIPLE_CHOICE'}">多选题</c:if>
+	                        <c:if test="${question.type == 'SINGLE_CHOICE'}">单选题</c:if>
+	                        <c:if test="${question.type == 'RIGHT_OR_WRONG'}">判断题</c:if>
+	                        <c:if test="${question.type == 'COMBINATION_QUESTION'}">组合题</c:if>
+                        </td>
+                        <td>${question.difficulty}</td>
+                        <td>
+                       <c:forEach var="knowledge" items="${question.knowledgePoints}" varStatus="st">
+                       <span class='label badge-info'>${knowledge.content}</span>
+                       </c:forEach>
+                        </td>
+                        <td>
+                        
+                        <div class="btn-group">
+                            <r:a class="btn btn-info" href="/combinedQuestion/${question.id}"><font color="white">查看</font></r:a>
+                            <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">&nbsp;<span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                            <li> <r:a href="/combinedQuestion/${question.id}/edit">编辑</r:a></li>
+                            <li><a href="javascript:" onclick="deleteQuestion('${question.id}')" >删除</a></li>
+                            </ul>
+                        </div><!-- /btn-group -->
+                        
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+            <tfoot>
+            <tr><td colspan="6">
+            <div class="toolbar">
+            <div class="pagination pagination-centered">
+            <r:paginate data="${questionList}" />
+            </div>
+            </div>
+            </td></tr>
+            </tfoot>
+        </table>
+	</c:if>
+
+<c:import url="/plugin/modal.jsp"></c:import>
+</r:layout>

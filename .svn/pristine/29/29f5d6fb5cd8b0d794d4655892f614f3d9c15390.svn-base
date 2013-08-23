@@ -1,0 +1,50 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import java.util.List;
+
+import me.donnior.rtl.paginate.PaginateSupportArray;
+
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.ExamDao;
+import com.boventech.demo.entity.Exam;
+import com.google.common.base.Strings;
+
+/**
+ * @author Administrator
+ *
+ */
+
+@Repository
+public class ExamDaoImpl extends AbstractBaseDaoImpl<Exam, String> implements ExamDao{
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.dao.ExamDao#search(com.boventech.demo.entity.Exam, com.boventech.demo.util.Paging)
+     */
+    @Override
+    public List<Exam> search(Exam exam, int page) {
+        // TODO Auto-generated method stub
+        StringBuilder builder = new StringBuilder("from Exam t where 1=1");
+        if(!Strings.isNullOrEmpty(exam.getContent())){
+            builder.append(" and content like '%"+exam.getContent()+"%'");
+        }
+        String queryString = builder.toString();
+        int count = this.executeCountQuery("select count(*) " + queryString);
+        List<Exam> examList = this.executeQueryWithPaging(queryString, page, DEFAULT_PAGESIZE);
+        return new PaginateSupportArray<Exam>(examList, page, DEFAULT_PAGESIZE, count);
+    }
+
+}

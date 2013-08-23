@@ -1,0 +1,82 @@
+$(function(){
+	$("#showOptions").load(contextPath+"singleQuestion/choice");
+	$("#modalContent").load(contextPath+"knowledgePoint");
+	
+	$("li[class='span2']").each(function(){
+		$(this).bind('closed', function () {
+		
+			 var mediaSrc=$(this).attr("id");
+			 if(mediaSrc.indexOf("/image")!=-1){
+			    	$("#imagePath").val("");
+			    }
+			    if(mediaSrc.indexOf("/video")!=-1){
+			    	$("#videoPath").val("");
+			    }
+			    if(mediaSrc.indexOf("/audio")!=-1){
+			    	$("#audioPath").val("");
+			    }
+			
+		})
+	});
+
+		
+	});
+
+//验证content非空并传递其中的值
+function validateContent(){
+	if($('#content').val()=='')
+	{
+		$('#contentLog').html('<font color=red>*题干不能为空</font>')
+		}
+	else
+	{
+		onSubmit();
+		}
+}
+
+//切换题型的选项
+function switchQuestion(obj){
+	var type=obj.val();
+	if(type=="rightOrWrong"){
+		window.location.href=contextPath+"combinedQuestion/rightOrWrong";
+	}
+	if(type=="choice"){
+		index=3; //添加选项在切换再切回时，避免index显示错误
+		window.location.href=contextPath+"combinedQuestion/choice";
+	}
+	if(type=="combination"){
+		window.location.href=contextPath+"combinedQuestion/combination";
+	}
+}
+
+//添加选择题选项
+var index=0;
+function addOptions(){
+	if(index==0){index=3};
+	$("#options").append("<tr><td align='right'>选项"+index+"：</td><td><input name='options' />&nbsp;&nbsp;<input name='rightAnswer' value='"+index+"' type='checkbox'/></td></tr>");
+	index++;
+}
+
+
+
+function onSubmit(){
+	
+	var rightAnswer=0;
+	var type="";
+	$("input[name='rightAnswer']").each(function () {  
+		type=$(this).attr("type");
+        if($(this).attr("checked")=="checked"){
+        	$(this).prev("input[name='multipleSelected']")
+        	rightAnswer++;
+        }  
+    });
+	if(rightAnswer==0 && (type=="checkbox" || type=="radio")){alert("请勾选正确答案");}
+	else{
+	if(rightAnswer==1 && type=="checkbox"){$("#type").attr("value","SINGLE_CHOICE");}
+	if(rightAnswer==1 && type=="radio"){$("#type").attr("value","RIGHT_OR_WRONG");}
+	if(rightAnswer>1 && type=="checkbox"){$("#type").attr("value","MULTIPLE_CHOICE");}
+	if(rightAnswer==0){$("#type").attr("value","COMBINATION_QUESTION");}
+	document.choiceForm.submit();
+	}
+}
+

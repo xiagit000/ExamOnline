@@ -1,0 +1,73 @@
+package com.boventech.demo.service.impl;
+
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boventech.demo.dao.SingleQuestionDao;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.SingleQuestion;
+import com.boventech.demo.service.KnowledgePointService;
+import com.boventech.demo.service.SingleQuestionService;
+import com.google.common.collect.Lists;
+
+@Service("questionService")
+@Transactional
+public class SingleQuestionServiceImpl implements SingleQuestionService {
+
+    @Autowired
+    private KnowledgePointService knowledgePointService;
+
+    @Autowired
+    private SingleQuestionDao questionDao;
+
+    @Override
+    public void save(SingleQuestion question) {
+        this.questionDao.save(question);
+    }
+
+    @Override
+    public SingleQuestion update(SingleQuestion question) {
+        return null;
+    }
+
+    @Override
+    public void delete(String id) {
+        SingleQuestion question = this.questionDao.findByID(id);
+        this.questionDao.delete(question);
+    }
+
+    @Override
+    public SingleQuestion getById(String id) {
+        return this.questionDao.findByID(id);
+    }
+
+    @Override
+    public List<SingleQuestion> randomAssignQuestions() {
+        Random random = new Random(100);
+        List<Integer> idList = Lists.newArrayList();
+        while (idList.size() < 21) {
+            int id = random.nextInt();
+            if (!idList.contains(id)) {
+                idList.add(id);
+
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public KnowledgePoint findKnowledgePointById(String id) {
+        return this.knowledgePointService.getById(id);
+    }
+
+    @Override
+    public SingleQuestion merge(SingleQuestion singleQuestion) {
+        return this.merge(singleQuestion);
+    }
+
+}

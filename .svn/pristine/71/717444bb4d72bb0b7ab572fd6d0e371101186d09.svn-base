@@ -1,0 +1,11 @@
+
+//保存已加载的节点（避免重复查询）
+var loadList=new Array();
+
+//保存最外层的节点对象
+var parents=[];
+$(function(){
+	$(".accordion-body").each(function(){
+		parents.push($(this));
+	});
+});

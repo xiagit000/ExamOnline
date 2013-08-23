@@ -1,0 +1,98 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.List;
+
+/**
+ * 试卷对应的实体类
+ * 
+ * @author Administrator
+ * 
+ */
+public class Exam {
+
+    // id
+    private String id;
+
+    // 试卷名称
+    private String content;
+
+    // 包含的题目
+    private List<Question> questions;
+
+    // 答题记录
+    private List<AnswerRecord> answerRecords;
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the content
+     */
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * @param content
+     *            the content to set
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * @return the questions
+     */
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    /**
+     * @param questions
+     *            the questions to set
+     */
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    /**
+     * @return the answerRecords
+     */
+    public List<AnswerRecord> getAnswerRecords() {
+        return answerRecords;
+    }
+
+    /**
+     * @param answerRecords
+     *            the answerRecords to set
+     */
+    public void setAnswerRecords(List<AnswerRecord> answerRecords) {
+        this.answerRecords = answerRecords;
+    }
+
+}

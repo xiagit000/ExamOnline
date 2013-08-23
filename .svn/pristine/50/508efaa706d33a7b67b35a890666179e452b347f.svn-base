@@ -1,0 +1,20 @@
+package com.boventech.demo.service;
+
+import java.util.List;
+
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.Answer.Score;
+
+public interface AnswerService {
+	
+	void save(Answer answer);
+	
+	Answer update(Answer answer);
+	
+	void delete(String id);
+	
+	Score compareUserAnswerWithStandardAnswer(String questionId,List<String> userAnswers);
+	
+	Score compareUserAnswerWithStandardAnswer(String questionId,boolean answerValue);
+
+}

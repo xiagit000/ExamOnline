@@ -1,0 +1,45 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.QuestionDao;
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.entity.Question.Type;
+
+/**
+ * @author Administrator
+ *
+ */
+@Repository
+public class QuestionDaoImpl extends AbstractBaseDaoImpl<Question, String> implements QuestionDao{
+    
+    @Override
+    public int allQuestionCount() {
+        String queryString="from Question";
+        List<Question> listQuestion = executeQueryWithoutPaging(queryString, new Object[0]);
+        return listQuestion.size();
+    }
+
+    @Override
+    public int questionCount(Type type) {
+        String queryString="from Question where type = ? ";
+        List<Question> listQuestion = executeQueryWithoutPaging(queryString, type);
+        return listQuestion.size();
+    }
+
+}

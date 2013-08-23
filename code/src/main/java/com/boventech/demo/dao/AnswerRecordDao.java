@@ -1,0 +1,27 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao;
+
+import java.util.Date;
+import java.util.List;
+
+import com.boventech.demo.entity.AnswerRecord;
+
+/**
+ * @author peng.xia
+ * 
+ */
+public interface AnswerRecordDao extends BaseDao<AnswerRecord, String> {
+    List<AnswerRecord> find(int page, Date startDate, Date endDate, String content);
+}

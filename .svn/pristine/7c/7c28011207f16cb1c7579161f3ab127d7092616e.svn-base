@@ -1,0 +1,42 @@
+package com.boventech.demo.controller;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
+import com.google.common.collect.Lists;
+
+@Controller
+@SessionAttributes({ "questions", "content", "questionStatus", "id" })
+@RequestMapping(value = "/")
+public class HomeController {
+
+    @RequestMapping(method = RequestMethod.GET)
+    public String index() {
+        return "index";
+    }
+
+    @RequestMapping(value = "go/{controller}", method = RequestMethod.GET)
+    public String index(@PathVariable String controller, HttpSession session) {
+        this.InitSession(session);
+        return "redirect:/" + controller;
+    }
+
+    /**
+     * 初始化session变量
+     * 
+     * @param model
+     * @param session
+     */
+    private void InitSession(HttpSession session) {
+        session.setAttribute("content", "");
+        session.setAttribute("questions", Lists.newArrayList());
+        session.setAttribute("questionStatus", "");
+        session.setAttribute("id", "");
+    }
+
+}

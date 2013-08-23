@@ -1,0 +1,94 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.service.impl;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boventech.demo.dao.KnowledgePointsDao;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.service.KnowledgePointService;
+
+/**
+ * @author Administrator
+ *
+ */
+@Service
+@Transactional
+public class KnowledgePointServiceImpl implements KnowledgePointService{
+    
+    @Autowired
+    private KnowledgePointsDao knowledgePointsDao;
+    
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.KnowledgePointService#findAll()
+     */
+    @Override
+    public List<KnowledgePoint> findChild(String expression) {
+        // TODO Auto-generated method stub
+        return this.knowledgePointsDao.findChild(expression);
+    }
+    
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.KnowledgePointService#save(com.boventech.demo.entity.KnowledgePoint)
+     */
+    @Override
+    public void save(KnowledgePoint knowledgePoint) {
+        // TODO Auto-generated method stub
+        this.knowledgePointsDao.save(knowledgePoint);
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.KnowledgePointService#getById()
+     */
+    @Override
+    public KnowledgePoint getById(String id) {
+        // TODO Auto-generated method stub
+        return this.knowledgePointsDao.findByID(id);
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.KnowledgePointService#findAllParents()
+     */
+    @Override
+    public List<KnowledgePoint> findAllParents() {
+        // TODO Auto-generated method stub
+        return this.knowledgePointsDao.findAllParents();
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.KnowledgePointService#findMaxSortCode()
+     */
+    @Override
+    public int findMaxSortCode(String code) {
+        // TODO Auto-generated method stub
+        List<KnowledgePoint> list=this.knowledgePointsDao.findChild(code);
+        
+        int[] suffixCode=new int[list.size()];
+        int index=0;
+        for (KnowledgePoint knowledgePoint : list) {
+            String[] codes=knowledgePoint.getSortCode().split("-");
+            suffixCode[index]=Integer.parseInt(codes[codes.length-1]);
+            index++;
+        }
+        
+        Arrays.sort(suffixCode);
+        return index==0?0:suffixCode[suffixCode.length-1];
+    }
+
+}

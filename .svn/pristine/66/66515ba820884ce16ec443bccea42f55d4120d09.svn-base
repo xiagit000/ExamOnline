@@ -1,0 +1,5 @@
+$(function(){
+	$(":input").keydown(function(){
+		$("#submit").removeAttr("disabled");
+	});
+});

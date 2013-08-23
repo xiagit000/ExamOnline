@@ -1,0 +1,75 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boventech.demo.dao.TestQuestionDao;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.TestQuestion;
+import com.boventech.demo.service.KnowledgePointService;
+import com.boventech.demo.service.TestQuestionService;
+import com.boventech.demo.util.Paging;
+
+/**
+ * @author Administrator
+ * 
+ */
+@Service
+@Transactional
+public class TestQuestionServiceImpl implements TestQuestionService {
+
+    @Autowired
+    private TestQuestionDao testQuestionDao;
+
+    @Autowired
+    private KnowledgePointService knowledgePointService;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.service.TestQuestionService#save(com.boventech.demo
+     * .entity.TestQuestion)
+     */
+    @Override
+    public void save(TestQuestion testQuestion) {
+        // TODO Auto-generated method stub
+        this.testQuestionDao.save(testQuestion);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.service.TestQuestionService#findKnowledgePointById
+     * (java.lang.String)
+     */
+    @Override
+    public KnowledgePoint findKnowledgePointById(String id) {
+        // TODO Auto-generated method stub
+        return this.knowledgePointService.getById(id);
+    }
+
+    @Override
+    public List<TestQuestion> search(TestQuestion testQuestion, String difficultyOrder, List<KnowledgePoint> knowledgePoints,
+            Paging paging) {
+        return this.testQuestionDao.search(testQuestion, difficultyOrder, knowledgePoints,paging.getPage());
+    }
+
+}

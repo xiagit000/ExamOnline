@@ -1,0 +1,79 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import java.util.List;
+
+import me.donnior.rtl.paginate.PaginateSupportArray;
+
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.TestQuestionDao;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.TestQuestion;
+import com.google.common.base.Strings;
+
+/**
+ * @author Administrator
+ *
+ */
+@Repository
+public class TestQuestionDaoImpl extends AbstractBaseDaoImpl<TestQuestion, String> implements TestQuestionDao{
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.dao.TestQuestionDao#search(com.boventech.demo.entity.TestQuestion, java.lang.String, com.boventech.demo.entity.KnowledgePoint, int)
+     */
+    @Override
+    public List<TestQuestion> search(TestQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, int page) {
+        StringBuilder builder =null;
+        StringBuilder builder2 =null;
+        if (knowledgePoints.size()>0){
+            builder= new StringBuilder("SELECT DISTINCT t from TestQuestion t join t.knowledgePoints k where k.id='"+knowledgePoints.get(0).getId()+"'");
+            for(int i=1;i<knowledgePoints.size();i++){
+                builder.append(" or k.id='"+knowledgePoints.get(i).getId()+"'");
+            }
+            builder2= new StringBuilder("from TestQuestion t join t.knowledgePoints k where k.id='"+knowledgePoints.get(0).getId()+"'");
+        }else{
+            builder= new StringBuilder("from TestQuestion t where 1=1");
+            builder2= new StringBuilder("from TestQuestion t where 1=1");
+        }
+        if (testQuestion.getType()!=null){
+            builder.append(" and t.type = " + testQuestion.getType().ordinal());
+            builder2.append(" and t.type = " + testQuestion.getType().ordinal());
+        }
+//        if (knowledgePoints.size()>0)
+//            builder.append(" and " + knowledgePoints.get(0) + " in (knowledgePoints)");
+        if (!Strings.isNullOrEmpty(testQuestion.getContent())){
+            builder.append(" and t.content LIKE " + "'%" + testQuestion.getContent() + "%'");
+            builder2.append(" and t.content LIKE " + "'%" + testQuestion.getContent() + "%'");
+        }
+        if (difficultyOrder.equals("desc")) {
+            builder.append(" order by t.difficulty desc");
+            builder2.append(" order by t.difficulty desc");
+        } else {
+            builder.append(" order by t.difficulty asc");
+            builder2.append(" order by t.difficulty asc");
+        }
+
+        String queryString = builder.toString();
+        String queryString2 = builder2.toString();
+        System.out.println("@@@@@@@@@@@");
+        System.out.println(queryString);
+        int count = this.executeCountQuery("select count(*) " + queryString2);
+        List<TestQuestion> QuestionList = this.executeQueryWithPaging(queryString, page, DEFAULT_PAGESIZE);
+        return new PaginateSupportArray<TestQuestion>(QuestionList, page, DEFAULT_PAGESIZE, count);
+    }
+
+}

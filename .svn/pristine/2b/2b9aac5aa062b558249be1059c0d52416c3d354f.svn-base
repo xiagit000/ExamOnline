@@ -1,0 +1,83 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.service.KnowledgePointService;
+
+@Controller
+@RequestMapping(value = "/knowledgePoint")
+public class KnowledgePointController {
+
+    @Autowired
+    private KnowledgePointService knowledgePointService;
+
+    /**
+     * 添加知识点
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public String index(ModelMap model) {
+        List<KnowledgePoint> parents = this.knowledgePointService.findAllParents();
+        model.addAttribute("parents", parents);
+        return "/knowledgePoint/index";
+    }
+
+    @RequestMapping(value = "save", method = RequestMethod.POST)
+    public String save(KnowledgePoint knowledgePoint) {
+        String parentCode = knowledgePoint.getSortCode();
+        int maxCode = this.knowledgePointService.findMaxSortCode(parentCode);
+        knowledgePoint.setSortCode(knowledgePoint.getSortCode() + "-" + (maxCode + 1));
+        this.knowledgePointService.save(knowledgePoint);
+        return "success";
+    }
+
+    /**
+     * 编辑知识点
+     */
+    @RequestMapping(value = "edit", method = RequestMethod.GET)
+    public String edit(ModelMap model) {
+
+        return "knowledgePoint/edit";        
+    }
+
+    /**
+     * 获取编辑页面字知识点
+     */
+    @RequestMapping(value = "edit/child", method = RequestMethod.GET)
+    public String getEditChild(KnowledgePoint knowledgePoint, ModelMap model) {
+        List<KnowledgePoint> parents = this.knowledgePointService.findChild(knowledgePoint.getSortCode());
+        model.addAttribute("parents", parents);
+        model.addAttribute("parentSortCode", knowledgePoint.getSortCode());
+        return "knowledgePoint/child/edit";
+    }
+
+    /**
+     * 获取子知识点
+     */
+    @RequestMapping(value = "child", method = RequestMethod.GET)
+    public String getChild(KnowledgePoint knowledgePoint, ModelMap model) {
+        List<KnowledgePoint> parents = this.knowledgePointService.findChild(knowledgePoint.getSortCode());
+        model.addAttribute("parents", parents);
+        model.addAttribute("parentSortCode", knowledgePoint.getSortCode());
+        return "knowledgePoint/child/index";
+    }
+}

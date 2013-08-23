@@ -1,0 +1,5 @@
+
+//加载知识点模块
+$(function() {
+	$("#modalContent").load(contextPath + "knowledgePoint");
+});

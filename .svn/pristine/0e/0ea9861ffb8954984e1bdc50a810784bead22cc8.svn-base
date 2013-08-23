@@ -1,0 +1,54 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import java.util.List;
+
+import me.donnior.rtl.paginate.PaginateSupportArray;
+
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.QuestionDao;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.Question;
+import com.google.common.base.Strings;
+
+@Repository
+public class QuestionDaoImpl extends AbstractBaseDaoImpl<Question, String> implements QuestionDao{
+
+    @Override
+    public List<Question> search(String type, String difficultyOrder, KnowledgePoint knowledgePoint, String content,
+            int page) {
+        StringBuilder builder = new StringBuilder("from Question where 1=1");
+        if( !Strings.isNullOrEmpty(type) )
+            builder.append(" and type = " + Integer.parseInt(type));
+        if( knowledgePoint != null )
+            builder.append(" and" + knowledgePoint + " in (knowledgePoints)");
+        if( !Strings.isNullOrEmpty(content) )
+            builder.append(" and content LIKE "+ "'%"+ content +"%'");
+        if( difficultyOrder.equals("desc")){
+            builder.append(" order by difficulty desc");
+        }else{
+            builder.append(" order by difficulty asc");
+        }
+        
+        String queryString = builder.toString();
+        System.out.println(queryString);
+        int count = this.executeCountQuery("select count(*) " + queryString);
+        List<Question> QuestionList = 
+                this.executeQueryWithPaging(queryString, page, DEFAULT_PAGESIZE);
+        return new PaginateSupportArray<Question>(QuestionList, page, DEFAULT_PAGESIZE, count);
+    }
+    
+}

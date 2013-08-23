@@ -1,0 +1,16 @@
+package com.boventech.demo.util;
+
+import java.util.List;
+
+import com.boventech.demo.entity.Question;
+import com.google.common.collect.Lists;
+
+public class DataBaseUtil {
+
+	public static List<Question> questionDB=Lists.newArrayList();
+
+	public static List<Question> getQuestionDB() {
+		return questionDB;
+	}
+	
+}

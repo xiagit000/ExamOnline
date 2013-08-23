@@ -1,0 +1,37 @@
+package com.boventech.demo.service;
+
+import java.util.List;
+
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.entity.Question.Type;
+
+public interface QuestionService {
+
+	void save(Question question);
+
+	Question update(Question question);
+
+	void delete(String id);
+	
+	Question getById(String id);
+	
+	List<Question> randomAssignQuestions();
+	
+	List<KnowledgePoint> findAllKnowledgePoints();
+	
+	KnowledgePoint findKnowledgePointById(String id);
+	
+	/**
+     * 统计所有题目的数量
+     * @return
+     */
+    int allQuestionCount();
+
+    /**
+     * 按照类型统计题目的数量
+     * @param type
+     * @return
+     */
+    int questionCount(Type type);
+}

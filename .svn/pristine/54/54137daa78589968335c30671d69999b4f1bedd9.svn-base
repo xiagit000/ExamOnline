@@ -1,0 +1,224 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import java.util.List;
+
+import me.donnior.rtl.paginate.PaginateSupportArray;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.CombinedQuestionDao;
+import com.boventech.demo.dao.ExamDao;
+import com.boventech.demo.entity.Exam;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.CombinedQuestion;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
+/**
+ * @author Administrator
+ * 
+ */
+@Repository
+public class CombinedQuestionDaoImpl extends AbstractBaseDaoImpl<CombinedQuestion, String> implements
+        CombinedQuestionDao {
+
+    @Autowired
+    ExamDao examDao;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.dao.TestQuestionDao#search(com.boventech.demo.entity
+     * .TestQuestion, java.lang.String,
+     * com.boventech.demo.entity.KnowledgePoint, int)
+     */
+    @Override
+    public List<CombinedQuestion> search(CombinedQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, int page) {
+        String queryString = this.getQueryString(testQuestion, difficultyOrder, knowledgePoints, "search");
+        int count = this.getTotal(testQuestion, difficultyOrder, knowledgePoints, page);
+        List<CombinedQuestion> QuestionList = this
+                .executeQueryWithPaging(queryString, page, DEFAULT_PAGESIZE);
+        return new PaginateSupportArray<CombinedQuestion>(QuestionList, page, DEFAULT_PAGESIZE, count);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.dao.CombinedQuestionDao#search(com.boventech.demo.
+     * entity.CombinedQuestion, java.lang.String, java.util.List, int,
+     * java.lang.String)
+     */
+    @Override
+    public List<CombinedQuestion> search(CombinedQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, int page, String id) {
+        // TODO Auto-generated method stub
+        // String queryString1= this
+        // .getQueryString(testQuestion, difficultyOrder, knowledgePoints,
+        // "search");
+        String queryString = this
+                .getQueryString(testQuestion, difficultyOrder, knowledgePoints, id, "search");
+        // String queryString= queryString1+" and t in("+queryString2+")";
+        System.out.println("################################################");
+        System.out.println(queryString);
+        System.out.println("################################################");
+        List<CombinedQuestion> QuestionList = this
+                .executeQueryWithPaging(queryString, page, DEFAULT_PAGESIZE);
+        int count = this.getTotal(testQuestion, difficultyOrder, knowledgePoints, id, page);
+        return new PaginateSupportArray<CombinedQuestion>(QuestionList, page, DEFAULT_PAGESIZE, count);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.dao.CombinedQuestionDao#getTotal(com.boventech.demo
+     * .entity.CombinedQuestion, java.lang.String, java.util.List, int)
+     */
+    @Override
+    public int getTotal(CombinedQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, int page) {
+        // TODO Auto-generated method stub
+        String queryString = this.getQueryString(testQuestion, difficultyOrder, knowledgePoints, "count");
+        int count = this.executeCountQuery("select count(*) " + queryString);
+        return count;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.dao.CombinedQuestionDao#getTotal(com.boventech.demo
+     * .entity.CombinedQuestion, java.lang.String, java.util.List, int)
+     */
+    @Override
+    public int getTotal(CombinedQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, String id, int page) {
+        // TODO Auto-generated method stub
+        // String queryString1= this
+        // .getQueryString(testQuestion, difficultyOrder, knowledgePoints,
+        // "count");
+        String queryString = this.getQueryString(testQuestion, difficultyOrder, knowledgePoints, id, "count");
+        // String queryString= queryString1+" not exsits("+queryString2+")";
+        int count = this.executeCountQuery("select count(*) " + queryString);
+        return count;
+    }
+
+    /**
+     * 根据参数拼凑查询语句
+     * 
+     * @param testQuestion
+     * @param difficultyOrder
+     * @param knowledgePoints
+     * @param action
+     * @return
+     */
+    private String getQueryString(CombinedQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, String action) {
+        StringBuilder builder = null;
+        StringBuilder builder2 = null;
+        if (knowledgePoints.size() > 0) {
+            builder = new StringBuilder(
+                    "SELECT DISTINCT t from CombinedQuestion t join t.knowledgePoints k where (k.id='"
+                            + knowledgePoints.get(0).getId() + "'");
+            builder2 = new StringBuilder("from CombinedQuestion t join t.knowledgePoints k where (k.id='"
+                    + knowledgePoints.get(0).getId() + "'");
+            for (int i = 1; i < knowledgePoints.size(); i++) {
+                builder.append(" or k.id='" + knowledgePoints.get(i).getId() + "'");
+                builder2.append(" or k.id='" + knowledgePoints.get(i).getId() + "'");
+            }
+            builder.append(")");
+            builder2.append(")");
+
+        } else {
+            builder = new StringBuilder("from CombinedQuestion t where 1=1");
+            builder2 = new StringBuilder("from CombinedQuestion t where 1=1");
+        }
+        if (testQuestion.getType() != null) {
+            builder.append(" and t.type = " + testQuestion.getType().ordinal());
+            builder2.append(" and t.type = " + testQuestion.getType().ordinal());
+        }
+        if (!Strings.isNullOrEmpty(testQuestion.getContent())) {
+            builder.append(" and t.content LIKE " + "'%" + testQuestion.getContent() + "%'");
+            builder2.append(" and t.content LIKE " + "'%" + testQuestion.getContent() + "%'");
+        }
+        if (difficultyOrder.equals("desc")) {
+            builder.append(" order by t.difficulty desc");
+            builder2.append(" order by t.difficulty desc");
+        } else {
+            builder.append(" order by t.difficulty asc");
+            builder2.append(" order by t.difficulty asc");
+        }
+
+        String queryString = builder.toString();
+        String queryString2 = builder2.toString();
+
+        return action.equals("search") ? queryString : queryString2;
+    }
+
+    private String getQueryString(CombinedQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, String id, String action) {
+        StringBuilder builder = null;
+        StringBuilder builder2 = null;
+        Exam exam = examDao.findByID(id);
+        List<Exam> list = Lists.newArrayList();
+        list.add(exam);
+        if (knowledgePoints.size() > 0) {
+            builder = new StringBuilder(
+                    "SELECT DISTINCT t from CombinedQuestion t  join t.knowledgePoints k where (k.id='"
+                            + knowledgePoints.get(0).getId() + "'");
+            builder2 = new StringBuilder("from CombinedQuestion t join t.knowledgePoints k where (k.id='"
+                    + knowledgePoints.get(0).getId() + "'");
+            for (int i = 1; i < knowledgePoints.size(); i++) {
+                builder.append(" or k.id='" + knowledgePoints.get(i).getId() + "'");
+                builder2.append(" or k.id='" + knowledgePoints.get(i).getId() + "'");
+            }
+            builder.append(") and '" + id + "' not in elements(t.exams)");
+            builder2.append(") and '" + id + "' not in elements(t.exams)");
+        } else {
+            builder = new StringBuilder("SELECT DISTINCT t from CombinedQuestion t where '" + id
+                    + "' not in elements(t.exams)");
+            builder2 = new StringBuilder("from CombinedQuestion t where '" + id
+                    + "' not in elements(t.exams)");
+        }
+
+        if (testQuestion.getType() != null) {
+            builder.append(" and t.type = " + testQuestion.getType().ordinal());
+            builder2.append(" and t.type = " + testQuestion.getType().ordinal());
+        }
+
+        if (!Strings.isNullOrEmpty(testQuestion.getContent())) {
+            builder.append(" and t.content LIKE " + "'%" + testQuestion.getContent() + "%'");
+            builder2.append(" and t.content LIKE " + "'%" + testQuestion.getContent() + "%'");
+        }
+        if (difficultyOrder.equals("desc")) {
+            builder.append(" order by t.difficulty desc");
+            builder2.append(" order by t.difficulty desc");
+        } else {
+            builder.append(" order by t.difficulty asc");
+            builder2.append(" order by t.difficulty asc");
+        }
+
+        String queryString = builder.toString();
+        String queryString2 = builder2.toString();
+
+        return action.equals("search") ? queryString : queryString2;
+    }
+
+}

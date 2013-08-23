@@ -1,0 +1,120 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev$
+ * $Author$
+ * $LastChangedDate$
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.UUID;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "answer")
+public class Answer {
+    public enum Score {
+        ALL, ZERO, HALF;
+    }
+    
+    @Id
+    private String id;
+
+    // 选项
+    private String content;
+ 
+    // 与content一一对应
+    private String uuidValue;
+
+    // 是否为正确答案
+    private boolean isRight;
+
+    // 属于哪一个问题
+    @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH})
+    @JoinColumn(name="question_id")
+    private Question question;
+
+    public Answer() {
+        this.uuidValue = UUID.randomUUID().toString();
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the content
+     */
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * @param content
+     *            the content to set
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * @return the uuidValue
+     */
+    public String getUuidValue() {
+        return uuidValue;
+    }
+
+    /**
+     * @return the isRight
+     */
+    public boolean isRight() {
+        return isRight;
+    }
+
+    /**
+     * @param isRight
+     *            the isRight to set
+     */
+    public void setRight(boolean isRight) {
+        this.isRight = isRight;
+    }
+
+    /**
+     * @return the question
+     */
+    public Question getQuestion() {
+        return question;
+    }
+
+    /**
+     * @param question
+     *            the question to set
+     */
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+}

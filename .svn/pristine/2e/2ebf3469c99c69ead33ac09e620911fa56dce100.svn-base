@@ -1,0 +1,28 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.AnswerRecordDao;
+import com.boventech.demo.entity.AnswerRecord;
+
+/**
+ * @author peng.xia
+ *
+ */
+@Repository
+public class AnswerRecordDaoImpl extends AbstractBaseDaoImpl<AnswerRecord, String> implements AnswerRecordDao{
+
+}

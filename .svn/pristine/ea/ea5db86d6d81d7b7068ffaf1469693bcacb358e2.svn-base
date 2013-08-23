@@ -1,0 +1,23 @@
+
+function onSubmit(){
+	var val="";
+	var id="";
+	$(":input").each(function () {
+		if(id!=$(this).attr("id")){
+			id=$(this).attr("id");
+			val="";
+		}
+		if($(this).attr("type")=="checkbox" || $(this).attr("type")=="radio" ){
+		var answer=$("#selected_"+$(this).attr("id"));
+		if(answer.val()==""){
+			 val="";
+		}
+        if($(this).attr("checked")=="checked"){
+        	val+=$(this).val()+";";
+        	answer.attr("value",val);
+        }  
+		}
+    });
+
+   document.answerForm.submit();
+}

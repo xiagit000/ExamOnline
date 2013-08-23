@@ -1,0 +1,38 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao;
+
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.entity.Question.Type;
+
+/**
+ * @author Administrator
+ *
+ */
+public interface QuestionDao extends BaseDao<Question, String>{
+    
+    /**
+     * 统计所有题目的数量
+     * @return
+     */
+    int allQuestionCount();
+
+    /**
+     * 按照类型统计题目的数量
+     * @param type
+     * @return
+     */
+    int questionCount(Type type);
+
+}

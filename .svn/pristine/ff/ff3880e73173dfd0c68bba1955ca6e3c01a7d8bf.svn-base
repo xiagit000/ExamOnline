@@ -1,0 +1,18 @@
+package com.boventech.demo.service;
+
+import java.util.List;
+
+import com.boventech.demo.entity.testpaper.TestPaper;
+
+public interface TestPaperService {
+	
+	void save(TestPaper testPaper);
+	
+	void update(TestPaper testPaper);
+	
+	void delete(String id);
+	
+	List<TestPaper> list();
+	
+
+}

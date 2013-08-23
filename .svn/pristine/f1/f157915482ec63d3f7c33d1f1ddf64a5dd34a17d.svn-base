@@ -1,0 +1,191 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.HashMap;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.boventech.demo.entity.BaseQuestion.Type;
+
+/**
+ * 试卷对应的实体类
+ * 
+ * @author Administrator
+ * 
+ */
+@Entity
+@Table(name = "exam")
+public class Exam {
+
+    // id
+    @Id
+    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid")
+    @GeneratedValue(generator = "hibernate-uuid")
+    private String id;
+
+    // 试卷名称
+    private String content;
+
+    // 包含的题目
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "CombinedQuestion_exam", inverseJoinColumns = @JoinColumn(name = "question_id", referencedColumnName = "questionId"), joinColumns = @JoinColumn(name = "exam_id", referencedColumnName = "id"))
+    private List<CombinedQuestion> combinedQuestions;
+
+    // 答题记录
+    @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AnswerRecord> answerRecords;
+    
+    
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the content
+     */
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * @param content
+     *            the content to set
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * @return the combinedQuestions
+     */
+    public List<CombinedQuestion> getCombinedQuestions() {
+        return combinedQuestions;
+    }
+
+    /**
+     * @param combinedQuestions
+     *            the combinedQuestions to set
+     */
+    public void setCombinedQuestions(List<CombinedQuestion> combinedQuestions) {
+        this.combinedQuestions = combinedQuestions;
+    }
+
+    /**
+     * @return the answerRecords
+     */
+    public List<AnswerRecord> getAnswerRecords() {
+        return answerRecords;
+    }
+
+    /**
+     * @param answerRecords
+     *            the answerRecords to set
+     */
+    public void setAnswerRecords(List<AnswerRecord> answerRecords) {
+        this.answerRecords = answerRecords;
+    }
+
+    public int getSingleChoices() {
+        int num = 0;
+        for (CombinedQuestion question : this.combinedQuestions) {
+            if (question.getType() == Type.SINGLE_CHOICE) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    public int getMultipleChoices() {
+        int num = 0;
+        for (CombinedQuestion question : this.combinedQuestions) {
+            if (question.getType() == Type.MULTIPLE_CHOICE) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    public int getRightOrWrongs() {
+        int num = 0;
+        for (CombinedQuestion question : this.combinedQuestions) {
+            if (question.getType() == Type.RIGHT_OR_WRONG) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    public int getCombinations() {
+        int num = 0;
+        for (CombinedQuestion question : this.combinedQuestions) {
+            if (question.getType() == Type.COMBINATION_QUESTION) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    public int getSingleQuestions() {
+        int num = 0;
+        for (CombinedQuestion question : this.combinedQuestions) {
+            num = num + question.getQuestions().size();
+        }
+        return num;
+    }
+
+    /**
+     * 获取知识点的分布
+     */
+    public HashMap<String, Double> getKnowledgeData() {
+        HashMap<String, Double> map = new HashMap<String, Double>();
+        for (CombinedQuestion combinedQuestion : this.combinedQuestions) {
+            for (SingleQuestion singleQuestion : combinedQuestion.getQuestions()) {
+                for (KnowledgePoint knowledgePoint : singleQuestion.getKnowledgePoints()) {
+                    if (map.containsKey(knowledgePoint.getContent())) {
+                        map.put(knowledgePoint.getContent(), map.get(knowledgePoint.getContent()) + 1);
+                    } else {
+                        map.put(knowledgePoint.getContent(), 1.0);
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
+}

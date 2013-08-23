@@ -1,0 +1,20 @@
+package com.boventech.demo.service;
+
+import java.util.List;
+
+import com.boventech.demo.entity.Question;
+
+public interface QuestionService {
+
+	void save(Question question);
+
+	Question update(Question question);
+
+	void delete(String id);
+	
+	Question getById(String id);
+	
+	List<Question> randomAssignQuestions();
+	
+
+}

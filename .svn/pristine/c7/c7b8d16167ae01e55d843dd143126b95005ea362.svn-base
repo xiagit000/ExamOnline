@@ -1,0 +1,104 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.boventech.demo.entity.Exam;
+import com.boventech.demo.service.ExamService;
+import com.boventech.demo.util.Paging;
+
+/**
+ * @author Administrator
+ * 
+ */
+
+@Controller
+@RequestMapping(value = "/exam")
+public class ExamController {
+
+    @Autowired
+    private ExamService examService;
+
+    /**
+     * 返回到题库设置页面
+     * 
+     * @param model
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public String index(Exam exam,Paging paging,ModelMap model) {
+        List<Exam> examList=this.examService.search(exam, paging);
+        model.addAttribute("examList", examList);
+        return "/exam/index";
+    }
+
+    /**
+     * 添加试卷
+     * 
+     * @param exam
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public String save(Exam exam) {
+        this.examService.save(exam);
+        return "redirect:/exam";
+    }
+
+    /**
+     * 到试卷添加页面
+     * 
+     * @param exam
+     * @return
+     */
+    @RequestMapping(value = "new", method = RequestMethod.GET)
+    public String editNew() {
+        return "/exam/add";
+    }
+    
+    /**
+     * 管理页面
+     * 
+     * @return
+     */
+    @RequestMapping(value = "{id}/edit", method = RequestMethod.GET)
+    public String edit(ModelMap model,@PathVariable String id) {
+        Exam exam=this.examService.findById(id);
+        model.addAttribute("exam", exam);
+        return "/exam/edit";
+    }
+    
+    /**
+     * 遍历没有添加到试卷中的所有题目
+     * 
+     * @param model
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "{id}/questionBank", method = RequestMethod.GET)
+    public String bank(ModelMap model,@PathVariable String id) {
+        Exam exam=this.examService.findById(id);
+        model.addAttribute("exam", exam);
+        return "/exam/questionBank/index";
+    }
+    
+    
+}

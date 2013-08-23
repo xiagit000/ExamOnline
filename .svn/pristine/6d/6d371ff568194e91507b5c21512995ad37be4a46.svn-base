@@ -1,0 +1,43 @@
+package com.boventech.demo.entity;
+
+import java.util.UUID;
+
+public class OptionalAnswer {
+
+    private String id;
+	
+    //选项类容
+	private String content;
+	
+	//和content一一对应的值
+	private String uuidValue;
+	
+	public OptionalAnswer(){
+		this.uuidValue=UUID.randomUUID().toString();
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getUuidValue() {
+		return uuidValue;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	
+	
+	
+
+}

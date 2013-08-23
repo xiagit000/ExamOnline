@@ -1,0 +1,122 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+/**
+ * @author peng.xia
+ * 
+ */
+@Entity
+@Table(name = "userAnswer")
+public class UserAnswer {
+
+    @Id
+    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid")
+    @GeneratedValue(generator = "hibernate-uuid")
+    private String id;
+
+    /**
+     * 所答题目
+     */
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "question_id")
+    private SingleQuestion question;
+
+    /**
+     * 解答
+     */
+    @ManyToMany(cascade = { CascadeType.REFRESH })
+    @JoinTable(name = "userAnswer_answer", inverseJoinColumns = @JoinColumn(name = "answer_id", referencedColumnName = "id"), joinColumns = @JoinColumn(name = "userAnswer_id", referencedColumnName = "id"))
+    private List<Answer> answers;
+
+    /**
+     * 正确率
+     */
+    private double accuracy;
+
+    /**
+     * @return the accuracy
+     */
+    public double getAccuracy() {
+        return accuracy;
+    }
+
+    /**
+     * @param accuracy
+     *            the accuracy to set
+     */
+    public void setAccuracy(double accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the question
+     */
+    public SingleQuestion getQuestion() {
+        return question;
+    }
+
+    /**
+     * @param question
+     *            the question to set
+     */
+    public void setQuestion(SingleQuestion question) {
+        this.question = question;
+    }
+
+    /**
+     * @return the answers
+     */
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    /**
+     * @param answers
+     *            the answers to set
+     */
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
+    }
+
+}

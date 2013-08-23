@@ -1,0 +1,211 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.service.impl;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boventech.demo.dao.AnswerRecordDao;
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.AnswerRecord;
+import com.boventech.demo.entity.Exam;
+import com.boventech.demo.entity.SingleQuestion;
+import com.boventech.demo.entity.UserAnswer;
+import com.boventech.demo.service.AnswerRecordService;
+import com.boventech.demo.service.AnswerService;
+import com.boventech.demo.service.ExamService;
+import com.boventech.demo.service.SingleQuestionService;
+import com.boventech.demo.util.RecordAnalysis;
+import com.boventech.demo.util.RecordStatistics;
+import com.google.common.collect.Lists;
+
+/**
+ * @author peng.xia
+ * 
+ */
+@Service
+@Transactional
+public class AnswerRecordServiceImpl implements AnswerRecordService {
+
+    @Autowired
+    private AnswerRecordDao answerRecordDao;
+
+    @Autowired
+    private ExamService examService;
+
+    @Autowired
+    private AnswerService answerService;
+
+    @Autowired
+    private SingleQuestionService singleQuestionService;
+
+    @Override
+    public AnswerRecord getAnswerRecord(String examId, String[] questionIds, String[] answerIds) {
+        List<UserAnswer> userAnswers = Lists.newArrayList();
+        AnswerRecord answerRecord = new AnswerRecord();
+
+        // 答题记录所对应的的试卷
+        Exam exam = examService.findById(examId);
+        answerRecord.setExam(exam);
+
+        // 对整个试卷的答题记录进行封装
+        for (int i = 0; i < questionIds.length; i++) {
+            List<Answer> answers = Lists.newArrayList();
+            UserAnswer userAnswer = new UserAnswer();
+            String questionId = questionIds[i];
+            SingleQuestion singleQuestion = this.singleQuestionService.getById(questionId);
+
+            // 答题记录所对应的题目
+            userAnswer.setQuestion(singleQuestion);
+
+            // 每道题的答题时间
+            userAnswer.setAnswerDate(new Date());
+
+            String[] strs = answerIds[i].split(";");
+
+            // 答题记录所对应的答题结果
+            for (String answerId : strs) {
+                Answer answer = this.answerService.findById(answerId);
+                answers.add(answer);
+            }
+            userAnswer.setAnswers(answers);
+            // 正确率
+            Double accuracy = this.getAccuracy(singleQuestion.getAnswers(), userAnswer.getAnswers());
+            userAnswer.setAccuracy(accuracy);
+
+            userAnswers.add(userAnswer);
+        }
+        // 答题准确率
+        answerRecord.setCreateDate(new Date());
+        answerRecord.setUserAnswers(userAnswers);
+        answerRecord.setAccuracy();
+        return answerRecord;
+    }
+
+    /**
+     * 与所答题目的正确答案进行对比，获得题目的正确率
+     */
+    @Override
+    public Double getAccuracy(List<Answer> standerAnswer, List<Answer> answers) {
+        double ac = 1;
+        int count = 0;
+        double half = 0.5;
+        for (Answer answer : standerAnswer) {
+            if (answer.isRight()) {
+                count++;
+            }
+        }
+
+        if (answers.size() > 0) {
+            for (Answer answer : answers) {
+                if (!answer.isRight()) {
+                    ac = 0;
+                }
+            }
+
+            if (ac == 1 && answers.size() < count) {
+                ac = half;
+            }
+        } else {
+            ac = 0;
+        }
+
+        return ac;
+    }
+
+    @Override
+    public void save(AnswerRecord answerRecord) {
+        this.answerRecordDao.save(answerRecord);
+    }
+
+    @Override
+    public AnswerRecord findById(String id) {
+        return this.answerRecordDao.findByID(id);
+    }
+
+    @Override
+    public List<AnswerRecord> findAll(int page, Date startDate, Date endDate, String content) {
+        return this.answerRecordDao.find(page, startDate, endDate, content);
+    }
+
+    /**
+     * 获取统计数据
+     */
+    @Override
+    public RecordStatistics getStatistics(AnswerRecord answerRecord) {
+        int rights = 0;
+        int halfs = 0;
+        int wrongs = 0;
+        double half = 1/2;
+        RecordStatistics statistics = new RecordStatistics();
+        for (UserAnswer answer : answerRecord.getUserAnswers()) {
+            if (answer.getAccuracy() == 1) {
+                rights++;
+            }
+            if (answer.getAccuracy() == half) {
+                halfs++;
+            }
+            if (answer.getAccuracy() == 0) {
+                wrongs++;
+            }
+        }
+
+        // 将统计数据封装到实体类中
+        statistics.setTotal(answerRecord.getExam().getSingleQuestions());
+        statistics.setChoices(answerRecord.getExam().getSingleChoices()
+                + answerRecord.getExam().getMultipleChoices());
+        statistics.setRightOrWrongs(answerRecord.getExam().getRightOrWrongs());
+        statistics.setCombinations(answerRecord.getExam().getCombinations());
+        statistics.setRights(rights);
+        statistics.setHalfs(halfs);
+        statistics.setWrongs(wrongs);
+        statistics.setNulls(answerRecord.getExam().getSingleQuestions()
+                - answerRecord.getUserAnswers().size());
+        return statistics;
+    }
+
+    /**
+     * 获取分析数据
+     */
+    @Override
+    public RecordAnalysis getAnalysis(AnswerRecord answerRecord) {
+        RecordAnalysis analysis = new RecordAnalysis();
+        HashMap<String, Double> map = (HashMap<String, Double>) answerRecord.getExam().getKnowledgeData();
+        HashMap<String, Double> map2 = (HashMap<String, Double>) answerRecord.getKnowledgeData();
+        HashMap<String, Double> countPercents = new HashMap<String, Double>();
+        HashMap<String, Double> rightPercents = new HashMap<String, Double>();
+        Iterator<Entry<String, Double>> iterator = map.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Entry<String, Double> entry = iterator.next();
+            countPercents.put(entry.getKey(), entry.getValue() / answerRecord.getExam().getSingleQuestions());
+            if (map2.get(entry.getKey()) != null) {
+                rightPercents.put(entry.getKey(), map2.get(entry.getKey()) / entry.getValue());
+            } else {
+                rightPercents.put(entry.getKey(), 0.0);
+            }
+        }
+
+        // 将分析后的数据封装到实体类中
+        analysis.setCountPercents(countPercents);
+        analysis.setRightPercents(rightPercents);
+        return analysis;
+    }
+}

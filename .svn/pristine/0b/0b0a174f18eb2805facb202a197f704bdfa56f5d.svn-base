@@ -1,0 +1,64 @@
+package com.boventech.demo.service.impl;
+
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.stereotype.Service;
+
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.service.QuestionService;
+import com.boventech.demo.util.DataBaseUtil;
+import com.google.common.collect.Lists;
+
+@Service("questionService")
+public class QuestionServiceImpl implements QuestionService {
+
+	@Override
+	public void save(Question question) {
+		DataBaseUtil.getQuestionDB().add(question);
+	}
+
+	@Override
+	public Question update(Question question) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(String id) {
+		for(Question question:DataBaseUtil.getQuestionDB()){
+			if(id.equals(question.getId())){
+				DataBaseUtil.getQuestionDB().remove(question);
+			}
+		}
+
+	}
+
+	@Override
+	public Question getById(String id) {
+		for(Question question:DataBaseUtil.getQuestionDB()){
+			if(id.equals(question.getId())){
+				return question;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public List<Question> randomAssignQuestions() {
+		Random random=new Random(100);
+		List<Integer> idList=Lists.newArrayList();
+		while(idList.size()<21){
+			int id=random.nextInt();
+			if(!idList.contains(id)){
+				idList.add(id);
+				
+			}
+		}
+		
+		return null;
+	}
+
+	
+
+}

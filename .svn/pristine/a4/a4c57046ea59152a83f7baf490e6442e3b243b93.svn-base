@@ -1,0 +1,139 @@
+ var fileList;
+ var path;
+
+window.onload = function () {
+
+    var oDropBox = document.getElementById('dropHere');
+
+    oDropBox.addEventListener('dragover', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $("#dropHere").attr("style","border:3px dashed yellow;");
+    }, false);
+    
+    oDropBox.addEventListener('dragenter', function (e) {
+    	e.stopPropagation();
+        e.preventDefault();
+    	 $("#dropHere").attr("style","border:3px dashed yellow;");
+    }, false);
+    
+    oDropBox.addEventListener('dragleave', function (e) {
+    	e.stopPropagation();
+    	e.preventDefault();
+    	$("#dropHere").attr("style","border:3px dashed silver;");
+    }, false);
+    
+    oDropBox.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $("#message").removeAttr("class");
+        $("#message").html("");
+        $("#progress").attr("style","display:none;");
+        $("#dropHere").attr("style","border:3px dashed silver;");
+        
+        fileList = e.dataTransfer.files;
+        var reader = new FileReader();
+
+        reader.readAsDataURL(fileList[0]);
+        reader.onload = function (e) {
+        	path=this.result;
+        	var oImg;
+        	if(fileSelected(fileList[0])=="image/jpeg"){
+        		oImg = document.createElement('img');
+        		oImg.src = this.result;
+        	}
+        	if(fileSelected(fileList[0])=="audio/mp3"){
+        		oImg = document.createElement('audio');
+        		oImg.src = this.result;
+                oImg.controls = "controls";
+        	}
+            if(fileSelected(fileList[0])=="video/mp4"){
+        		oImg = document.createElement('video');
+        		oImg.src = this.result;
+        		oImg.width =458;
+        		oImg.height=264;
+                oImg.controls = "controls";
+        	}
+            
+            $("#dropHere").html(oImg);
+        }
+
+    }
+
+};
+
+function fileSelected(uploadFile) {
+    if (uploadFile) {
+        var fileSize = 0;
+        if (uploadFile.size >= 1024 * 1024)
+            fileSize = (Math.round(uploadFile.size * 100 / (1024 * 1024)) / 100).toString() + 'MB';
+        else
+            fileSize = (Math.round(uploadFile.size * 100 / 1024) / 100).toString() + 'KB';
+
+        document.getElementById('fileName').innerHTML = 'Name: ' + uploadFile.name;
+        document.getElementById('fileSize').innerHTML = 'Size: ' + fileSize;
+        document.getElementById('fileType').innerHTML = 'Type: ' + uploadFile.type;
+        return uploadFile.type;
+    }
+}
+
+function uploadFile() {
+	if(fileList[0]!=""){
+	$("#progress").attr("style","display:block;");
+    var xhr = new XMLHttpRequest();
+    var fd = new FormData();
+    fd.append("fileToUpload",fileList[0]);
+    xhr.upload.addEventListener("progress", uploadProgress, false);
+    xhr.addEventListener("load", uploadComplete, false);
+    xhr.addEventListener("error", uploadFailed, false);
+    xhr.addEventListener("abort", uploadCanceled, false);
+    xhr.open("POST", contextPath+"uploads");
+    xhr.send(fd);
+	}
+  }
+
+  function uploadProgress(evt) {
+    if (evt.lengthComputable) {
+      var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+      $('#progressNumber').attr("style","width: "+percentComplete+"%;")
+    }
+    else {
+      document.getElementById('progressNumber').innerHTML = 'unable to compute';
+    }
+  }
+
+  function uploadComplete(evt) {
+    /* This event is raised when the server send back a response */
+	$("#message").attr("class","label label-success");
+    $("#message").html("上传成功！");
+    var data=evt.target.responseText;
+    data=data.substring(data.indexOf("/")+1,data.indexOf(";"));
+    if(data.indexOf("/image")!=-1){
+    	$("#imagePath").val(data);
+    	 $("#showMedia").append("<li class='span3'><a href='#' class='thumbnail'>" +
+    	    		"<img src='"+path+"' alt='' /><h5>"+fileList[0].name+"</h5></a></li>");
+    }
+    if(data.indexOf("/video")!=-1){
+    	$("#videoPath").val(data);
+    	 $("#showMedia").append("<li class='span3'><a href='#' class='thumbnail'>" +
+    	    		"<img src='"+contextPath+"resources/img/play.jpg' alt='' /> <h5>"+fileList[0].name+"</h5></a></li>");
+    }
+    if(data.indexOf("/audio")!=-1){
+    	$("#audioPath").val(data);
+    	 $("#showMedia").append("<li class='span3'><a href='#' class='thumbnail'>" +
+    			   "<img src='"+contextPath+"resources/img/play.jpg' alt='' /><h5>"+fileList[0].name+"</h5></a></li>");
+    }
+    
+   
+  }
+
+  function uploadFailed(evt) {
+	  $("#message").html("上传的过程中发生异常");
+  }
+
+  function uploadCanceled(evt) {
+	  $("#message").html("上传被终止或客户端的连接被中断");
+  }
+

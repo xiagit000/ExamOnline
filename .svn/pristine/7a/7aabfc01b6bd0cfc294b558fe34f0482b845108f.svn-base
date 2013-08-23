@@ -1,0 +1,80 @@
+<%-- 
+    Copyright 2010. 
+    This document may not be reproduced, distributed or used 
+    in any manner whatsoever without the expressed written 
+    permission of Boventech Corp.
+    
+    $Rev: Rev $
+    $Author: Author $
+    $LastChangedDate: LastChangedDate $
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="r" uri="r-tag"%>
+<script src="<c:url value="/resources/js/jquery-1.8.2.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/resources/js/question/add.js"/>" type="text/javascript"></script>
+<r:layout title="ChoiceQuestion">
+<h4 class="nav-header">在线测试系统>>选择题录入</h4>
+<form name="choiceForm" action="<c:url value='/question'/>" method="get">
+<table>
+<tr><td>
+  <table id="singleChoice"> 
+  <tr><td align="right"><h4>题型：</h4></td>
+  <td>
+  <select id="questionType" onchange="switchQuestion($(this))">
+  <option value="choice">选择题</option>
+  <option value="rightOrWrong">判断题</option>
+  </select>
+  </td>
+  </tr>
+  <tr >
+  <td align="right"><h4>题目：</h4></td>
+  <td><textarea rows="3" name="content" style="width:500;overflow-x:visible;"></textarea></td>
+  </tr>  
+  <tr >
+  <td align="right"><h4>难易度：</h4></td>
+  <td><input name="difficulty"/><font color="red">（数值越大难度越高）</font></td>
+  </tr>
+   <tr >
+  <td align="right"><h4>知识点：</h4></td>
+  <td><a href="<c:url value='/knowledgePoint/add'/>">添加新知识点+</a></td>
+  </tr>
+  <tr>
+    <td></td>
+  <td >
+  <table>
+  <tr>
+  <td rowspan="2">
+  <select multiple="multiple" id="allKnowledgePoints" style="width:150;height:120;">
+  <c:forEach items="${allKnowledgePoints}" var="knowledgePoint">
+  <option value="${knowledgePoint.id }">${knowledgePoint.content }</option>
+  </c:forEach>
+  </select>
+  </td>
+  <td>
+  <input type="button" value="添加>" onclick="addPoints()"/>
+  </td>
+  <td rowspan="2">
+  <select multiple="multiple" name="knowledges" id="knowledgePoints" style="width:150;height:120;">
+  </select>
+  </td>
+  </tr>
+  <tr>
+  <td><input type="button" value="<移除" onclick="removePoints()"/></td>
+  </tr>
+  </table>
+  </td>
+  </tr>
+  <tr><td colspan="2"><hr /></td></tr>
+  <tr ><td colspan="2" id="options"><!-- 动态加载题目选项 --></td></tr>
+  </table>
+  </td>
+  </tr>
+  <tr><td><hr /></td></tr>
+  <tr><td align="right">
+  <input type="hidden" name="type" id="type"/>
+  <input type="button" onclick="onSubmit()"  value="提交"/>
+  </td></tr>
+  </table>
+</form>
+</r:layout>

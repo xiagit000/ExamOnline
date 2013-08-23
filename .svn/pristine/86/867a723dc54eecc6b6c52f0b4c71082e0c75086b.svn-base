@@ -1,0 +1,28 @@
+     <ul class="thumbnails" id="showMedia">
+   <c:if test="${!empty subQuestion.imagePath}" >
+                <li class='span2'>
+                <a data-toggle='modal' href='#playModal' onclick=play('${subQuestion.imagePath}') class='thumbnail'>
+                   <img src="<c:url value="/${subQuestion.imagePath}"/>" />
+                   <center><h5>点击查看大图</h5></center>
+                </a>
+                </li>
+                </c:if>
+                
+                <c:if test="${!empty subQuestion.videoPath}" >
+                <li class='span2'>
+                <a data-toggle='modal' href='#playModal' onclick=play('${subQuestion.videoPath}') class='thumbnail'>
+                   <img src="<c:url value="/resources/img/play.jpg"/>" />
+                   <center><h5>点击播放视频</h5></center>
+                </a>
+                </li>
+                </c:if>
+                
+                <c:if test="${!empty subQuestion.audioPath}" >
+                <li class='span2'>
+                <a data-toggle='modal' href='#playModal' onclick=play('${subQuestion.audioPath}') class='thumbnail'>
+                   <img src="<c:url value="/resources/img/play.jpg"/>" />
+                   <center><h5>点击播放音频</h5></center>
+                </a>
+                </li>
+                </c:if>
+                </ul>

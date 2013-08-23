@@ -1,0 +1,96 @@
+<%-- 
+    Copyright 2010. 
+    This document may not be reproduced, distributed or used 
+    in any manner whatsoever without the expressed written 
+    permission of Boventech Corp.
+    
+    $Rev: Rev $
+    $Author: Author $
+    $LastChangedDate: LastChangedDate $
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="r" uri="r-tag"%>
+<script type="text/javascript">var contextPath="<c:url value='/'/>"</script>
+<script src="<c:url value="/resources/js/jquery-1.8.2.js"/>"
+    type="text/javascript"></script>
+<script src="<c:url value="/resources/js/combinedQuestion/add.js"/>"
+    type="text/javascript"></script>
+<r:layout title="ChoiceQuestion">
+<c:import url="/plugin/playMedia.jsp"></c:import>
+    <ul class="breadcrumb">
+        <li><r:a href="/">首页</r:a> <span class="divider">/</span></li>
+        <li><r:a href="#">试题管理</r:a> <span class="divider">/</span></li>
+        <li class="active">录入试题</li>
+    </ul>
+    <div class="container">
+            <fieldset>
+                <legend>查看选择题</legend>
+                <label class="label label-info">题型：</label> 
+                <strong>
+                    ${ combinationQuestion.type == "MULTIPLE_CHOICE" ? '多选题' : ''}
+                    ${ combinationQuestion.type == "SINGLE_CHOICE" ? '单选题' : ''}
+                    ${ combinationQuestion.type == "RIGHT_OR_WRONG" ? '判断题' : ''}
+                    ${ combinationQuestion.type == "COMBINATION_QUESTION" ? '组合题' : ''}
+                    </strong>
+                <br /> 
+                <hr>
+                <label class="label label-info">题干：</label>
+                <strong>${combinationQuestion.content}?</strong>
+                <ul class="thumbnails" id="showMedia">
+                
+                <c:if test="${!empty combinationQuestion.imagePath}" >
+                <li class='span2'>
+                <a data-toggle='modal' href='#playModal' onclick=play('${combinationQuestion.imagePath}') class='thumbnail'>
+                   <img src="<c:url value="/${combinationQuestion.imagePath}"/>" />
+                   <center><h5>点击查看大图</h5></center>
+                </a>
+                </li>
+                </c:if>
+                
+                <c:if test="${!empty combinationQuestion.videoPath}" >
+                <li class='span2'>
+                <a data-toggle='modal' href='#playModal' onclick=play('${combinationQuestion.videoPath}') class='thumbnail'>
+                   <img src="<c:url value="/resources/img/play.jpg"/>" />
+                   <center><h5>点击播放视频</h5></center>
+                </a>
+                </li>
+                </c:if>
+                
+                <c:if test="${!empty combinationQuestion.audioPath}" >
+                <li class='span2'>
+                <a data-toggle='modal' href='#playModal' onclick=play('${combinationQuestion.audioPath}') class='thumbnail'>
+                   <img src="<c:url value="/resources/img/play.jpg"/>" />
+                   <center><h5>点击播放音频</h5></center>
+                </a>
+                </li>
+                </c:if>
+                
+                </ul>
+                <hr>
+                <label class="label label-info">难易度：</label>
+               <strong>${combinationQuestion.difficulty }</strong>
+                <br />
+                <hr>
+            </fieldset>
+            <label class="label label-info">知识点：</label>
+
+            <c:forEach var="knowledge" items="${combinationQuestion.knowledgePoints}" varStatus="st">
+                       <label class='label'>${knowledge.content}</label>
+                       </c:forEach>
+
+            <hr>
+            <label class="label label-info">选项答案：</label>
+            <c:forEach var="answer" items="${combinationQuestion.questions[0].answers}" varStatus="st">
+            
+            <strong> ${st.index+1}.<span style="text-decoration: underline;">${answer.content}</span>&nbsp;&nbsp;(${ answer.right == true? '正确' : '错误'})</strong>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            
+              </c:forEach>
+
+            <hr>
+            <input type="hidden" name="type" id="type" /> <br /> 
+            <a class="btn" href="javascript:history.go(-1);">返回</a>
+    </div>
+</r:layout>

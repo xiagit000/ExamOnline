@@ -1,0 +1,63 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: 1 $
+ * $Author: zinan.liao $
+ * $LastChangedDate: 2012-12-19 11:15:44 +0800 (Wed, 19 Dec 2012) $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
+public class ChoiceQuestion extends Question {
+
+    public enum Type {
+
+        MULTIPLE_CHOICE,
+
+        SINGLE_CHOICE;
+
+    }
+
+    // 选择题类型
+    private Type type;
+
+    // 选项集合
+    private List<OptionalAnswer> optionalAnswers = Lists.newArrayList();
+
+    // 标准答案
+    private Answer anwer;
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public List<OptionalAnswer> getOptionalAnswers() {
+        return optionalAnswers;
+    }
+
+    public void setOptionalAnswers(List<OptionalAnswer> optionalAnswers) {
+        this.optionalAnswers = optionalAnswers;
+    }
+
+    public Answer getAnwer() {
+        return anwer;
+    }
+
+    public void setAnwer(Answer anwer) {
+        this.anwer = anwer;
+    }
+
+}

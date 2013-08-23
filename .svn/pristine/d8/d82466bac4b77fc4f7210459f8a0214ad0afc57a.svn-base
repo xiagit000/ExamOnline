@@ -1,0 +1,225 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.BaseQuestion.Type;
+import com.boventech.demo.entity.CombinedQuestion;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.SingleQuestion;
+import com.boventech.demo.service.CombinedQuestionService;
+import com.boventech.demo.util.Paging;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
+@Controller
+@RequestMapping(value = "/combinedQuestion")
+public class CombinedQuestionController {
+
+    @Autowired
+    private CombinedQuestionService combinedQuestionService;
+
+    /**
+     * 查询所有（分页）
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public String index(CombinedQuestion testQuestion, String difficultyOrder, String knowledgePointId,
+            String knowledgePointContent, Paging paging, Model model) {
+        if (difficultyOrder == null) {
+            difficultyOrder = "desc";
+        }
+
+        // 知识点集合
+        List<KnowledgePoint> knowledgePoints = Lists.newArrayList();
+        KnowledgePoint knowledgePoint = null;
+        if (!Strings.isNullOrEmpty(knowledgePointId)) {
+            String[] ids = knowledgePointId.split(";");
+            for (String id : ids) {
+                knowledgePoint = this.combinedQuestionService.findKnowledgePointById(id);
+                knowledgePoints.add(knowledgePoint);
+            }
+        }
+
+        List<CombinedQuestion> questionList = combinedQuestionService.search(testQuestion, difficultyOrder,
+                knowledgePoints, paging);
+
+        model.addAttribute("testQuestion", testQuestion);
+        model.addAttribute("difficultyOrder", difficultyOrder);
+        model.addAttribute("knowledgePointId", knowledgePointId);
+        model.addAttribute("knowledgePointContent", knowledgePointContent);
+        model.addAttribute("questionList", questionList);
+        return "combinedQuestion/index";
+    }
+
+    /**
+     * 试题录入
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public String create(CombinedQuestion testQuestion, String[] options, String[] knowledges,
+            int[] rightAnswer, ModelMap model) {
+        List<SingleQuestion> questions = Lists.newArrayList();
+        CombinedQuestion combinedQuestion = this.getCombinedQuestion(testQuestion, options, knowledges,
+                rightAnswer, questions);
+        this.combinedQuestionService.save(combinedQuestion);
+        return combinedQuestion.getType() == Type.COMBINATION_QUESTION ? "redirect:/singleQuestion/"
+                + combinedQuestion.getId() + "/add" : "redirect:/combinedQuestion";
+    }
+
+    /**
+     * 查询试题
+     */
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public String show(ModelMap model, @PathVariable String id) {
+        CombinedQuestion combinationQuestion = this.combinedQuestionService.findById(id);
+        String dir = this.getDir(combinationQuestion.getType());
+        model.addAttribute("combinationQuestion", combinationQuestion);
+        return "combinedQuestion/" + dir + "/index";
+    }
+
+    /**
+     * 编辑试题
+     */
+    @RequestMapping(value = "{id}/edit", method = RequestMethod.GET)
+    public String edit(ModelMap model, @PathVariable String id) {
+        CombinedQuestion combinationQuestion = this.combinedQuestionService.findById(id);
+        String dir = this.getDir(combinationQuestion.getType());
+        model.addAttribute("combinationQuestion", combinationQuestion);
+        return "combinedQuestion/" + dir + "/edit";
+    }
+
+    /**
+     * 更新试题
+     */
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    public String update(ModelMap model, @PathVariable String id, CombinedQuestion testQuestion,
+            String[] options, String[] knowledges, int[] rightAnswer) {
+        testQuestion.setId(id);
+        CombinedQuestion combinedQuestion = null;
+
+        if (testQuestion.getType() != Type.COMBINATION_QUESTION) {
+            combinedQuestion = this.getCombinedQuestion(testQuestion, options, knowledges, rightAnswer,
+                    testQuestion.getQuestions());
+        } else {
+            combinedQuestion = this.combinedQuestionService.findById(id);
+            combinedQuestion.setContent(testQuestion.getContent());
+        }
+
+        this.combinedQuestionService.update(combinedQuestion);
+        return "redirect:/combinedQuestion";
+    }
+
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    public String destroy(ModelMap model, @PathVariable String id) {
+        CombinedQuestion combinedQuestion = this.combinedQuestionService.findById(id);
+        this.combinedQuestionService.delete(combinedQuestion);
+        return "redirect:/combinedQuestion";
+    }
+
+    /**
+     * 组合题
+     */
+    @RequestMapping(value = "combination", method = RequestMethod.GET)
+    public String combinationQuestion(ModelMap model) {
+        return "combinedQuestion/combination/add";
+    }
+
+    /**
+     * 选择题
+     */
+    @RequestMapping(value = "choice", method = RequestMethod.GET)
+    public String choiceQuestion(ModelMap model) {
+        return "combinedQuestion/choice/add";
+    }
+
+    /**
+     * 判断题
+     */
+    @RequestMapping(value = "rightOrWrong", method = RequestMethod.GET)
+    public String rightOrWrongQuestion(ModelMap model) {
+        return "combinedQuestion/rightorwrong/add";
+    }
+    
+
+    /**
+     * 将接受到的参数封装成组合题
+     */
+    private CombinedQuestion getCombinedQuestion(CombinedQuestion testQuestion, String[] options,
+            String[] knowledges, int[] rightAnswer, List<SingleQuestion> questions) {
+
+        // 对question进行封装
+        if (testQuestion.getType() != Type.COMBINATION_QUESTION) {
+            SingleQuestion question = new SingleQuestion();
+            question.setContent(testQuestion.getContent());
+            question.setDifficulty(testQuestion.getDifficulty());
+            question.setType(testQuestion.getType());
+
+            List<Answer> answers = Lists.newArrayList();
+            List<KnowledgePoint> points = Lists.newArrayList();
+
+            // 录入选项答案
+            for (int i = 0; i < options.length; i++) {
+                Answer optionalAnswer = new Answer();
+                for (int m : rightAnswer) {
+                    if (i == m - 1) {
+                        optionalAnswer.setRight(true);
+                    }
+                }
+                optionalAnswer.setContent(options[i]);
+                answers.add(optionalAnswer);
+            }
+
+            // 录入知识点
+            for (String knowledgePoint : knowledges) {
+                KnowledgePoint point = this.combinedQuestionService.findKnowledgePointById(knowledgePoint);
+                points.add(point);
+            }
+            question.setAnswers(answers);
+            question.setKnowledgePoints(points);
+            questions = Lists.newArrayList();
+            questions.add(question);
+
+            testQuestion.setKnowledgePoints(points);
+            testQuestion.setQuestions(questions);
+        }
+
+        return testQuestion;
+    }
+
+    /**
+     * 根据类型判断返回的路径
+     */
+    private String getDir(Type type) {
+        String dir = "";
+        if (type == Type.COMBINATION_QUESTION) {
+            dir = "combination";
+        }
+        if (type == Type.MULTIPLE_CHOICE || type == Type.SINGLE_CHOICE) {
+            dir = "choice";
+        }
+        if (type == Type.RIGHT_OR_WRONG) {
+            dir = "rightorwrong";
+        }
+        return dir;
+    }
+}

@@ -1,0 +1,93 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boventech.demo.dao.CombinedQuestionDao;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.CombinedQuestion;
+import com.boventech.demo.service.KnowledgePointService;
+import com.boventech.demo.service.CombinedQuestionService;
+import com.boventech.demo.util.Paging;
+
+/**
+ * @author Administrator
+ * 
+ */
+@Service
+@Transactional
+public class CombinedQuestionServiceImpl implements CombinedQuestionService {
+
+    @Autowired
+    private CombinedQuestionDao testQuestionDao;
+
+    @Autowired
+    private KnowledgePointService knowledgePointService;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.service.TestQuestionService#save(com.boventech.demo
+     * .entity.TestQuestion)
+     */
+    @Override
+    public void save(CombinedQuestion testQuestion) {
+        // TODO Auto-generated method stub
+        this.testQuestionDao.save(testQuestion);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.boventech.demo.service.TestQuestionService#findKnowledgePointById
+     * (java.lang.String)
+     */
+    @Override
+    public KnowledgePoint findKnowledgePointById(String id) {
+        // TODO Auto-generated method stub
+        return this.knowledgePointService.getById(id);
+    }
+
+    @Override
+    public List<CombinedQuestion> search(CombinedQuestion testQuestion, String difficultyOrder, List<KnowledgePoint> knowledgePoints,
+            Paging paging) {
+        return this.testQuestionDao.search(testQuestion, difficultyOrder, knowledgePoints,paging.getPage());
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.TestQuestionService#findById(java.lang.String)
+     */
+    @Override
+    public CombinedQuestion findById(String id) {
+        // TODO Auto-generated method stub
+        return this.testQuestionDao.findByID(id);
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.CombinedQuestionService#update(com.boventech.demo.entity.CombinedQuestion)
+     */
+    @Override
+    public void update(CombinedQuestion combinedQuestion) {
+        // TODO Auto-generated method stub
+        this.testQuestionDao.update(combinedQuestion);
+    }
+
+}

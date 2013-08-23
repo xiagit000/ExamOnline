@@ -1,0 +1,24 @@
+<%-- 
+    Copyright 2010. 
+    This document may not be reproduced, distributed or used 
+    in any manner whatsoever without the expressed written 
+    permission of Boventech Corp.
+    
+    $Rev: Rev $
+    $Author: Author $
+    $LastChangedDate: LastChangedDate $
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+  <tr >
+  <td align="right"><h4>选项：</h4></td>
+  <td><a href="javascript:" onclick="addOptions()">添加选项+</a>  </td>
+  </tr>
+  <tr >
+  <td align="right">选项1：</td>
+  <td><input name="options"/>&nbsp;&nbsp;<input name="rightAnswer" value="1" type="checkbox"/></td>
+  </tr>
+   <tr >
+  <td align="right">选项2：</td>
+  <td><input name="options"/>&nbsp;&nbsp;<input name="rightAnswer" value="2" type="checkbox"/></td>
+  </tr>

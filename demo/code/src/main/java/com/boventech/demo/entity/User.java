@@ -1,0 +1,88 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: 40 $
+ * $Author: zinan.liao $
+ * $LastChangedDate: 2013-01-06 17:36:39 +0800 (星期日, 06 一月 2013) $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+@Entity
+@Table(name="user")
+public class User {
+
+    @Id
+    @GenericGenerator(name="idGenerator", strategy="uuid")
+    @GeneratedValue(generator="idGenerator")
+    private String id;
+    
+    private String username;
+    
+    private String password;
+    
+    private String realname;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AnswerRecord> answerRecords;
+    
+    
+    public List<AnswerRecord> getAnswerRecords() {
+        return answerRecords;
+    }
+
+    public void setAnswerRecords(List<AnswerRecord> answerRecords) {
+        this.answerRecords = answerRecords;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
+    }
+    
+    
+}

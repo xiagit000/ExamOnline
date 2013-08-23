@@ -1,0 +1,62 @@
+
+$(function(){
+	$("#options").load("/demo/question/choice");
+	});
+
+//切换题型的选项
+function switchQuestion(obj){
+	var type=obj.val();
+	if(type=="rightOrWrong"){
+		$("#options").load("/demo/question/rightOrWrong");
+	}
+	if(type=="choice"){
+		$("#options").load("/demo/question/choice");
+	}
+}
+
+//添加选择题选项
+var index=3;
+function addOptions(){
+	$("#options").append("<tr><td align='right'>选项"+index+"：</td><td><input name='options' />&nbsp;&nbsp;<input name='rightAnswer' value='"+index+"' type='checkbox'/></td></tr>");
+	index++;
+}
+
+//添加知识点
+function addPoints(){
+	 $("#allKnowledgePoints").find("option:selected").each(function(){
+		$("#knowledgePoints").append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>");
+		$(this).remove();
+	 });
+}
+
+//移除知识点
+function removePoints(){
+	$("#knowledgePoints").find("option:selected").each(function(){
+		$("#allKnowledgePoints").append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>");
+		$(this).remove();
+	 });
+}
+
+function onSubmit(){
+	
+	$("#knowledgePoints").find("option").each(function(){
+		$(this).attr("selected","selected");
+	 });
+	
+	var rightAnswer=0;
+	var type="";
+	$("input[name='rightAnswer']").each(function () {  
+		type=$(this).attr("type");
+        if($(this).attr("checked")=="checked"){
+        	$(this).prev("input[name='multipleSelected']")
+        	rightAnswer++;
+        }  
+    });
+	if(rightAnswer==0){alert("请勾选正确答案");}
+	else{
+	if(rightAnswer==1 && type=="checkbox"){$("#type").attr("value","SINGLE_CHOICE");}
+	if(rightAnswer==1 && type=="radio"){$("#type").attr("value","RIGHT_OR_WRONG");}
+	if(rightAnswer>1){$("#type").attr("value","MULTIPLE_CHOICE");}
+	document.choiceForm.submit();
+	}
+}

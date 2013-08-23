@@ -1,0 +1,89 @@
+
+
+
+
+//加载子知识点
+function loadData(code){
+	var child=$("#child_"+code);
+	var show=$("#demo_"+code);
+	var isLoad=true;
+	switchIcon(show);
+	
+	for (var i=0;i<loadList.length;i++) {
+		if(code==loadList[i]){
+			isLoad=false;
+		}
+	}
+	
+	if(isLoad){
+	child.load(contextPath+"knowledgePoint/child?sortCode="+code,function(data){
+		child.html(data);
+		loadList.push(code);
+	});
+	}
+}
+
+//切换节点图标
+function switchIcon(obj){
+	if(obj.attr("class").indexOf("in")>0){
+		obj.prev("div").find("i").attr("class","icon-plus");
+	}else{
+		obj.prev("div").find("i").attr("class","icon-minus");
+		
+		var code=(obj.attr("id")).split("_");
+		if(code[1]>0){
+			
+		for(var i=0;i<parents.length;i++){
+			if(obj.attr("id")!=parents[i].attr("id")){
+				parents[i].prev("div").find("i").attr("class","icon-plus");
+			}
+		}
+		
+		}
+	}
+}
+
+//根据知识点关系进行选择
+var choices;
+var ids;
+function selectPoint(obj){
+	var parent=obj.parent().parent().parent();
+	var child=obj.parent().next().find("input");
+	var parentPoint=parent.parent().prev("div").find("input");
+	
+	if(obj.attr("checked")=="checked"){
+	if(parent.attr("class")=="accordion-inner"){
+		parentPoint.attr("checked","checked");
+		selectPoint(parentPoint);
+	}
+	}else{
+		child.attr("checked",false);
+	}
+	
+	//遍历所选择的知识点，并显示
+	choices=[];
+	ids=[];
+	$("input[name='pointList']").each(function(){
+		if($(this).attr("checked")=="checked"){
+			choices.push($(this).val());
+			ids.push($(this).attr("id"));
+		}
+	});
+	
+	var showPoints="";
+	for(var i=0;i<choices.length;i++){
+		showPoints+="<span class='label label-info'>"+choices[i]+"</span>&nbsp;"
+	}
+	
+	$("#choices").html(showPoints);
+}
+
+//向录题页面提交知识点
+function submitPoints(){
+	var showPoints="";
+	for(var i=0;i<choices.length;i++){
+		showPoints+="<span class='label'>"+choices[i]+"</span><input type='hidden' value='"+ids[i]+"' name='knowledges'/>&nbsp;"
+	}
+	
+	$("#showPoints").html(showPoints);
+}

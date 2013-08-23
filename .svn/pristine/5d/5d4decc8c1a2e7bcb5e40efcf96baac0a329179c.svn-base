@@ -1,0 +1,42 @@
+package com.boventech.demo.service.impl;
+
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.service.QuestionService;
+import com.boventech.demo.util.DataBaseUtil;
+
+public class QuestionServiceImpl implements QuestionService {
+
+	@Override
+	public void save(Question question) {
+		DataBaseUtil.getQuestionDB().add(question);
+	}
+
+	@Override
+	public Question update(Question question) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(String id) {
+		for(Question question:DataBaseUtil.getQuestionDB()){
+			if(id.equals(question.getId())){
+				DataBaseUtil.getQuestionDB().remove(question);
+			}
+		}
+
+	}
+
+	@Override
+	public Question getById(String id) {
+		for(Question question:DataBaseUtil.getQuestionDB()){
+			if(id.equals(question.getId())){
+				return question;
+			}
+		}
+		return null;
+	}
+
+	
+
+}

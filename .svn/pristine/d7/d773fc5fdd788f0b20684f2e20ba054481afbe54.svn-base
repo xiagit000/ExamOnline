@@ -1,0 +1,162 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: 45 $
+ * $Author: liang.zhou $
+ * $LastChangedDate: 2013-01-23 15:32:43 +0800 (星期三, 23 一月 2013) $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+@Entity
+@Table(name = "testQuestion")
+public class TestQuestion {
+    public enum Type {
+
+        MULTIPLE_CHOICE,
+
+        SINGLE_CHOICE,
+
+        RIGHT_OR_WRONG,
+
+        COMBINATION_QUESTION;
+
+    }
+
+    @Id
+    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid")
+    @GeneratedValue(generator = "hibernate-uuid")
+    private String id;
+
+    // 题干
+    private String content;
+
+    // 类型
+    private Type type;
+
+    // 难易度
+    private int difficulty;
+
+    // 包含的子题
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "testQuestion_id")
+    private List<Question> Questions;
+
+    // 所包含的知识点
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "testQuestion_knowledgePoint",
+    inverseJoinColumns = @JoinColumn(name = "knowledgePoint_id", referencedColumnName = "id"),
+    joinColumns = @JoinColumn(name = "testQuestion_id", referencedColumnName = "id"))
+    private List<KnowledgePoint> knowledgePoints;
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the content
+     */
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * @param content
+     *            the content to set
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * @return the type
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
+     * @param type
+     *            the type to set
+     */
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    /**
+     * @return the difficulty
+     */
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    /**
+     * @param difficulty
+     *            the difficulty to set
+     */
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    /**
+     * @return the questions
+     */
+    public List<Question> getQuestions() {
+        return Questions;
+    }
+
+    /**
+     * @param questions
+     *            the questions to set
+     */
+    public void setQuestions(List<Question> questions) {
+        Questions = questions;
+    }
+
+    /**
+     * @return the knowledgePoints
+     */
+    public List<KnowledgePoint> getKnowledgePoints() {
+        return knowledgePoints;
+    }
+
+    /**
+     * @param knowledgePoints
+     *            the knowledgePoints to set
+     */
+    public void setKnowledgePoints(List<KnowledgePoint> knowledgePoints) {
+        this.knowledgePoints = knowledgePoints;
+    }
+
+}

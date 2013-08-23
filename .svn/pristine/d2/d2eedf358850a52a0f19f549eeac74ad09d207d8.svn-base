@@ -1,0 +1,41 @@
+var inputIndex=1;
+
+//添加知识节点（渲染）
+function addPoint(obj){
+	obj.append(
+		"<div class='accordion-group'>"
+        +"<div class='accordion-heading'>"
+        +"<a class='accordion-toggle' data-toggle='collapse'  data-parent='#knowledgeTree' href='#demo_"+inputIndex+"'><i class='icon-plus'></i>"
+        +"<span id='new_"+inputIndex+"'><input id='input_"+inputIndex+"'/><button class='btn' onclick='savePoint("+inputIndex+")'>确定</button></span></a>"
+        +"</div>"
+        +"<div id='demo_"+inputIndex+"' class='accordion-body collapse'>"
+        +"<div class='accordion-inner' id='inner_"+inputIndex+"'></div>"
+        +"</div>"
+        +"</div>"
+        );
+	inputIndex++;
+}
+
+//保存知识点（数据持久化）
+function savePoint(index){
+	var obj=$("#input_"+index); 
+	var show=$("#new_"+index);
+	var child=$("#demo_"+index);
+	var inner=$("#inner_"+index);
+	
+	show.load(contextPath+"knowledgePoint/save?content="+obj.val(),function(data){
+		if(data.indexOf("SUCCESS")>0){
+			show.text(obj.val());
+			inner.html(
+					"<div id='parent_"+index+"'>"
+					+"<div>"
+					+'<div class="accordion-group">'
+			        +'<div class="accordion-heading">'
+			        +'<a class="accordion-toggle" data-toggle="collapse"  data-parent="#knowledgeTree" onclick="addPoint()"><center>添加</center></a>'
+			        +'</div>'
+					);
+		}else{
+			show.append("<font color=red>添加失败</font>")
+		}
+	});
+}

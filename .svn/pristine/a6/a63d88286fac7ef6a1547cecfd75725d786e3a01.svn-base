@@ -1,0 +1,8 @@
+var result=0;
+$(function(){
+	$(".score").each(function(){
+		result+=parseFloat($(this).text());
+	});
+	$("#showResult").html("<h4>本套试题满分"+totalPoints+"分，" +
+    "测试得分：<font size='6' class='score' style='text-decoration: underline;'>"+result+"</font>分</h4>");
+});

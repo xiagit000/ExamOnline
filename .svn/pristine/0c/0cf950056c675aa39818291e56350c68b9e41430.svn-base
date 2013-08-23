@@ -1,0 +1,100 @@
+package com.boventech.demo.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.Answer.Score;
+import com.boventech.demo.entity.ChoiceQuestion;
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.entity.RightOrWrongQuestion;
+import com.boventech.demo.service.AnswerService;
+import com.boventech.demo.service.QuestionService;
+
+@Service("answerService")
+public class AnswerServiceImpl implements AnswerService {
+	
+	@Autowired
+	QuestionService questionService;
+
+	@Override
+	public void save(Answer answer) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Answer update(Answer answer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(String id) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Score compareUserAnswerWithStandardAnswer(String questionId,List<String> userAnswers) {
+		Question question=this.questionService.getById(questionId);
+		if(question instanceof ChoiceQuestion){
+			ChoiceQuestion choiceQuestion=(ChoiceQuestion)question;
+			if(choiceQuestion.getType()==ChoiceQuestion.Type.SINGLE_CHOICE){
+				return compareSingleChoiceAnswers(choiceQuestion.getAnwer().getValues(),userAnswers);
+			}else{
+				return compareMultipleChoiceAnswers(choiceQuestion.getAnwer().getValues(),userAnswers);
+			}
+		}
+		return Answer.Score.ZERO;
+	}
+	
+	private Score compareSingleChoiceAnswers(List<String> standardAnswers,List<String> userAnswers){
+		if(userAnswers.isEmpty()||userAnswers.size()==0||userAnswers.size()>1){
+			return Answer.Score.ZERO;
+		}
+		if(standardAnswers.get(0).equals(userAnswers.get(0))){
+			return Answer.Score.ALL;
+		}
+		return Answer.Score.ZERO;
+	}
+	
+	private Score compareMultipleChoiceAnswers(List<String> standardAnswers,List<String> userAnswers){
+		if(userAnswers.size()>standardAnswers.size()||userAnswers.size()==0){
+			return Answer.Score.ZERO;
+		}
+		boolean flag=false;
+		for(String answerValue:userAnswers){
+			flag=false;
+			for(String standardAnswer:standardAnswers){
+				if(standardAnswer.equals(answerValue)){
+					flag=true;
+				}
+			}
+		}
+		if(flag&&(userAnswers.size()==standardAnswers.size())){
+			return Answer.Score.ALL;
+		}
+		if(flag&&(userAnswers.size()<standardAnswers.size())){
+			return Answer.Score.HALF;
+		}
+		return Answer.Score.ZERO;
+	}
+
+	@Override
+	public Score compareUserAnswerWithStandardAnswer(String questionId,boolean answerValue) {
+		Question question=this.questionService.getById(questionId);
+		if(question instanceof RightOrWrongQuestion){
+			RightOrWrongQuestion rightOrWrongQuestion=(RightOrWrongQuestion)question;
+			if((rightOrWrongQuestion.isRight()&&answerValue) || (!rightOrWrongQuestion.isRight()&&!answerValue)){
+				return Answer.Score.ALL;
+			}
+		}
+		return Answer.Score.ZERO;
+	}
+
+	
+
+}

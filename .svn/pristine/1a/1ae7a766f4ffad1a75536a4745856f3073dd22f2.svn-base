@@ -1,0 +1,19 @@
+var inputIndex=1;
+function addPoint(){
+	$("#knowledgeTree").append(
+		"<div class='accordion-group'>"
+        +"<div class='accordion-heading'>"
+        +"<a class='accordion-toggle' data-toggle='collapse'  data-parent='#knowledgeTree'><i class='icon-plus'></i>"
+        +"<input id='input_"+inputIndex+"'/><button class='btn' onclick='savePoint("+inputIndex+")'>确定</button></a>"
+        +"</div>"
+        +"<div id='demo_${knowledge.id}' class='accordion-body collapse'>"
+        +"<div class='accordion-inner'>234</div>"
+        +"</div>"
+        +"</div>"
+        );
+	inputIndex++;
+}
+
+function savePoint(index){
+	
+}

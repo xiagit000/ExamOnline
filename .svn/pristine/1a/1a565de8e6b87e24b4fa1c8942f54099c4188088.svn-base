@@ -1,0 +1,15 @@
+function onSubmit(){
+	var rightAnswer=0;
+	$("input[name='rightAnswer']").each(function () {  
+        if($(this).attr("checked")=="checked"){
+        	$(this).prev("input[name='multipleSelected']")
+        	rightAnswer++;
+        }  
+    });
+	if(rightAnswer==0){alert("请勾选正确答案");}
+	else{
+	if(rightAnswer==1){$("#type").attr("value","SINGLE_CHOICE");}
+	if(rightAnswer>1){$("#type").attr("value","MULTIPLE_CHOICE");}
+	document.choiceForm.submit();
+	}
+}

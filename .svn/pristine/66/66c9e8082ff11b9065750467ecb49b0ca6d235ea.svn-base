@@ -1,0 +1,45 @@
+package com.boventech.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.service.QuestionService;
+
+@Controller
+@RequestMapping(value = "/question")
+public class QuestionController {
+
+	@Autowired
+	private QuestionService questionService;
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public String read(@PathVariable Long id) {
+		return null;
+	}
+	
+	@RequestMapping(method = RequestMethod.GET)
+	public String index(@RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+		return "question/index";
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public String save(Question question) {
+		return null;
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public String destroy(@PathVariable String id) {
+		return null;
+	}
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    String update(@PathVariable String id,Question question) {
+		return null;
+    }
+
+}

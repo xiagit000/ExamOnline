@@ -1,0 +1,64 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
+import me.donnior.rtl.paginate.PaginateSupportArray;
+
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.AnswerRecordDao;
+import com.boventech.demo.entity.AnswerRecord;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
+/**
+ * @author peng.xia
+ * 
+ */
+@Repository
+public class AnswerRecordDaoImpl extends AbstractBaseDaoImpl<AnswerRecord, String> implements AnswerRecordDao {
+
+    @Override
+    public List<AnswerRecord> find(int page,String date,String content) {
+        StringBuilder builder = new StringBuilder("from AnswerRecord t where 1=1");
+        List<Object> list = Lists.newArrayList();
+        if(!Strings.isNullOrEmpty(date)){
+            builder.append(" and t.createDate BETWEEN ? and ?");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd"); 
+            String[] dates=date.split("-");
+            try {
+                list.add(sdf.parse(dates[0]));
+                list.add(sdf.parse(dates[1]));
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        if(!Strings.isNullOrEmpty(content)){
+            builder.append(" and t.exam.content like ?");
+            list.add("%"+content+"%");
+        }
+        builder.append(" order by t.createDate desc");
+        String queryString = builder.toString();
+        int count = this.executeCountQuery("select count(*) " + queryString, list.toArray());
+        List<AnswerRecord> answerRecords = this.executeQueryWithPaging(queryString, page, DEFAULT_PAGESIZE,
+                list.toArray());
+        return new PaginateSupportArray<AnswerRecord>(answerRecords, page, DEFAULT_PAGESIZE, count);
+    }
+
+}

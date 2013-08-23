@@ -1,0 +1,46 @@
+apply plugin: 'java'
+apply plugin: 'war'
+
+repositories {  
+    mavenCentral()  
+    
+    maven { url "http://192.168.88.130/artifactory/repo" }
+    maven { url "http://192.168.88.130/artifactory/plugins-releases" }
+
+    mavenLocal()
+}
+
+apply plugin: 'jetty'
+jettyRun.contextPath = '/'
+
+dependencies {  
+
+    testCompile 'junit:junit:4.8.1'
+    compile 'me.donnior:rtl:0.3'
+    compile 'com.google.guava:guava:r09'
+    compile("org.springframework:spring-context:$SpringframeworkVersion"){
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    compile "org.springframework:spring-webmvc:$SpringframeworkVersion"
+    compile "org.springframework:spring-core:$SpringframeworkVersion"
+    compile "org.springframework:spring-test:$SpringframeworkVersion"
+    compile "org.springframework:spring-beans:$SpringframeworkVersion"
+    compile "org.springframework:spring-orm:$SpringframeworkVersion"
+
+    compile 'commons-collections:commons-collections:3.2'
+    compile 'commons-fileupload:commons-fileupload:1.2.2'
+    compile 'commons-io:commons-io:1.3.2'
+    compile 'org.hibernate:hibernate-core:3.6.1.Final'
+    compile 'javassist:javassist:3.8.0.GA'
+    compile 'org.hibernate:hibernate-entitymanager:3.6.1.Final'
+    compile 'mysql:mysql-connector-java:5.1.17'
+    compile 'jstl:jstl:1.2'
+    compile 'c3p0:c3p0:0.9.1.2'
+    compile 'javax.servlet:servlet-api:2.5'
+    compile 'javax.servlet.jsp:jsp-api:2.1'
+    compile 'javax.servlet:jstl:1.2'
+    compile 'com.google.code.gson:gson:1.5'
+    compile 'commons-fileupload:commons-fileupload:1.2.2'
+    compile 'org.slf4j:slf4j-api:1.6.4'
+    compile 'org.slf4j:slf4j-log4j12:1.6.4'
+}

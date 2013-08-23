@@ -1,0 +1,7 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="r" uri="r-tag"%>
+
+<r:layout title="题库管理系统">
+    <h4>欢迎访问在线测试系统.<h4>
+</r:layout>

@@ -1,0 +1,8 @@
+
+
+function loadData(code){
+	var child=$("#child_"+code);
+	child.load(contextPath+"knowledgePoint/child?sortCode="+code,function(data){
+		child.html(data);
+	});
+}

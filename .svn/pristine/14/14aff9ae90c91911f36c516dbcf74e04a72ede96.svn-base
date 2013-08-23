@@ -1,0 +1,87 @@
+package com.boventech.demo.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.Answer.Score;
+import com.boventech.demo.entity.BaseQuestion.Type;
+import com.boventech.demo.entity.Question;
+
+import com.boventech.demo.service.AnswerService;
+import com.boventech.demo.service.QuestionService;
+
+@Service("answerService")
+public class AnswerServiceImpl implements AnswerService {
+	
+	@Autowired
+	QuestionService questionService;
+
+	@Override
+	public void save(Answer answer) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Answer update(Answer answer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(String id) {
+		// TODO Auto-generated method stub
+
+	} 
+
+	@Override
+	public Score compareUserAnswerWithStandardAnswer(String questionId,List<String> userAnswers) {
+		Question question=this.questionService.getById(questionId);
+			if(question.getType()==Type.SINGLE_CHOICE){
+				return compareSingleChoiceAnswers(userAnswers,userAnswers);
+			}else{
+				return compareMultipleChoiceAnswers(userAnswers,userAnswers);
+			}
+	}
+	
+	private Score compareSingleChoiceAnswers(List<String> standardAnswers,List<String> userAnswers){
+		if(userAnswers.isEmpty()||userAnswers.size()==0||userAnswers.size()>1){
+			return Answer.Score.ZERO;
+		}
+		if(standardAnswers.get(0).equals(userAnswers.get(0))){
+			return Answer.Score.ALL;
+		}
+		return Answer.Score.ZERO;
+	}
+	
+	private Score compareMultipleChoiceAnswers(List<String> standardAnswers,List<String> userAnswers){
+		if(userAnswers.size()>standardAnswers.size()||userAnswers.size()==0||userAnswers.isEmpty()){
+			return Answer.Score.ZERO;
+		}
+		for(String answerValue:userAnswers){
+			if(!standardAnswers.contains(answerValue)){
+				return Answer.Score.ZERO;
+			}
+		}
+		if(userAnswers.size()==standardAnswers.size()){
+			return Answer.Score.ALL;
+		}else{
+			return Answer.Score.HALF;
+		}
+	}
+
+	@Override
+	public Score compareUserAnswerWithStandardAnswer(String questionId,boolean answerValue) {
+//		Question question=this.questionService.getById(questionId);
+			if((answerValue) || (!answerValue)){
+				return Answer.Score.ALL;
+			}
+		return Answer.Score.ZERO;
+	}
+
+	
+
+}

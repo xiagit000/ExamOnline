@@ -1,0 +1,185 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev$
+ * $Author$
+ * $LastChangedDate$
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+/**
+ * 答题记录
+ * 
+ * @author Blue
+ * 
+ */
+@Entity
+@Table(name = "answerRecored")
+public class AnswerRecord implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GenericGenerator(name = "hibernate-uuid", strategy = "uuid")
+    @GeneratedValue(generator = "hibernate-uuid")
+    private String id;
+
+    /**
+     * 所答试卷
+     */
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "exam_id")
+    private Exam exam;
+
+    /**
+     * 所答题目
+     */
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "question_id")
+    private SingleQuestion question;
+
+    /**
+     * 解答
+     */
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "answerRecored_answer", inverseJoinColumns = @JoinColumn(name = "answer_id", referencedColumnName = "id"), joinColumns = @JoinColumn(name = "answerRecored_id", referencedColumnName = "id"))
+    private List<Answer> answers;
+
+    /**
+     * 正确率
+     */
+    private double accuracy;
+
+    /**
+     * 答题人
+     */
+    /*
+     * @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH})
+     * 
+     * @JoinColumn(name="user_id") private User user;
+     */
+
+    /**
+     * 最后答题时间
+     */
+    private Date createDate;
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the exam
+     */
+    public Exam getExam() {
+        return exam;
+    }
+
+    /**
+     * @param exam
+     *            the exam to set
+     */
+    public void setExam(Exam exam) {
+        this.exam = exam;
+    }
+
+    /**
+     * @return the question
+     */
+    public SingleQuestion getQuestion() {
+        return question;
+    }
+
+    /**
+     * @param question
+     *            the question to set
+     */
+    public void setQuestion(SingleQuestion question) {
+        this.question = question;
+    }
+
+    /**
+     * @return the answers
+     */
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    /**
+     * @param answers
+     *            the answers to set
+     */
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
+    }
+
+    /**
+     * @return the accuracy
+     */
+    public double getAccuracy() {
+        return accuracy;
+    }
+
+    /**
+     * @param accuracy
+     *            the accuracy to set
+     */
+    public void setAccuracy(double accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    /**
+     * @return the createDate
+     */
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    /**
+     * @param createDate
+     *            the createDate to set
+     */
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    /*
+     * public User getUser() { return user; }
+     * 
+     * public void setUser(User user) { this.user = user; }
+     */
+
+}

@@ -1,0 +1,339 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.controller;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.BaseQuestion.Type;
+import com.boventech.demo.entity.CombinedQuestion;
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.SingleQuestion;
+import com.boventech.demo.service.CombinedQuestionService;
+import com.boventech.demo.util.Paging;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
+/**
+ * @author Administrator
+ * 
+ */
+@Controller
+@SessionAttributes({ "questions", "content", "questionStatus", "id" })
+@RequestMapping(value = "/combinedQuestion")
+public class CombinedQuestionController {
+
+    @Autowired
+    private CombinedQuestionService combinedQuestionService;
+
+    /**
+     * 查询所有（分页）
+     * 
+     * @param testQuestion
+     * @param difficultyOrder
+     * @param knowledgePointId
+     * @param knowledgePointContent
+     * @param paging
+     * @param model
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public String index(CombinedQuestion testQuestion, String difficultyOrder, String knowledgePointId,
+            String knowledgePointContent, Paging paging, Model model, HttpSession session) {
+        if (difficultyOrder == null) {
+            difficultyOrder = "desc";
+        }
+
+        // 知识点集合
+        List<KnowledgePoint> knowledgePoints = Lists.newArrayList();
+        KnowledgePoint knowledgePoint = null;
+        if (!Strings.isNullOrEmpty(knowledgePointId)) {
+            String[] ids = knowledgePointId.split(";");
+            for (String id : ids) {
+                knowledgePoint = this.combinedQuestionService.findKnowledgePointById(id);
+                knowledgePoints.add(knowledgePoint);
+            }
+        }
+
+        List<CombinedQuestion> questionList = combinedQuestionService.search(testQuestion, difficultyOrder,
+                knowledgePoints, paging);
+
+        this.InitSession(model, session);
+        model.addAttribute("testQuestion", testQuestion);
+        model.addAttribute("difficultyOrder", difficultyOrder);
+        model.addAttribute("knowledgePointId", knowledgePointId);
+        model.addAttribute("knowledgePointContent", knowledgePointContent);
+        model.addAttribute("questionList", questionList);
+        return "combinedQuestion/index";
+    }
+
+    /**
+     * 试题录入
+     * 
+     * @param testQuestion
+     * @param options
+     * @param knowledges
+     * @param rightAnswer
+     * @param model
+     * @param questions
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public String create(CombinedQuestion testQuestion, String[] options, String[] knowledges,
+            int[] rightAnswer, ModelMap model, @ModelAttribute("questions") List<SingleQuestion> questions) {
+
+        CombinedQuestion combinedQuestion = this.getCombinedQuestion(testQuestion, options, knowledges,
+                rightAnswer, model, questions);
+        model.addAttribute("questions", Lists.newArrayList());
+        model.addAttribute("content", "");
+        this.combinedQuestionService.save(combinedQuestion);
+        return "redirect:/combinedQuestion";
+    }
+
+    /**
+     * 查询试题
+     * 
+     * @param model
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
+    public String show(ModelMap model, @PathVariable String id) {
+        CombinedQuestion combinationQuestion = this.combinedQuestionService.findById(id);
+        String dir = this.getDir(combinationQuestion.getType());
+        model.addAttribute("combinationQuestion", combinationQuestion);
+        return "combinedQuestion/" + dir + "/index";
+    }
+
+    /**
+     * 编辑试题
+     * 
+     * @param model
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "{id}/edit", method = RequestMethod.GET)
+    public String edit(ModelMap model, @PathVariable String id, HttpSession session) {
+        CombinedQuestion combinationQuestion = this.combinedQuestionService.findById(id);
+        String dir = this.getDir(combinationQuestion.getType());
+
+        if (!session.getAttribute("id").equals(id) || session.getAttribute("questionStatus").equals("")) {
+            model.addAttribute("questionStatus", "edit");
+            model.addAttribute("questions", combinationQuestion.getQuestions());
+        }
+
+        model.addAttribute("id", id);
+        model.addAttribute("combinationQuestion", combinationQuestion);
+        return "combinedQuestion/" + dir + "/edit";
+    }
+
+    /**
+     * 更新试题
+     * 
+     * @param model
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    public String update(ModelMap model, @PathVariable String id, CombinedQuestion testQuestion,
+            String[] options, String[] knowledges, int[] rightAnswer,
+            @ModelAttribute("questions") List<SingleQuestion> questions) {
+        testQuestion.setId(id);
+        CombinedQuestion combinedQuestion = this.getCombinedQuestion(testQuestion, options, knowledges,
+                rightAnswer, model, questions);
+        this.combinedQuestionService.update(combinedQuestion);
+        return "redirect:/combinedQuestion";
+    }
+    
+    @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+    public String destroy(ModelMap model, @PathVariable String id) {
+        CombinedQuestion combinedQuestion=this.combinedQuestionService.findById(id);
+        this.combinedQuestionService.delete(combinedQuestion);
+        return "redirect:/combinedQuestion";
+    }
+
+    /**
+     * 组合题
+     * 
+     * @return
+     */
+    @RequestMapping(value = "combination", method = RequestMethod.GET)
+    public String combinationQuestion(ModelMap model,
+            @ModelAttribute("questions") List<SingleQuestion> questions,
+            @ModelAttribute("content") String content, HttpSession session) {
+        if (session.getAttribute("questionStatus") == "edit") {
+            model.addAttribute("questionStatus", "add");
+            model.addAttribute("questions", Lists.newArrayList());
+        }
+        model.addAttribute("subQuestions", questions);
+        model.addAttribute("content", content);
+        return "combinedQuestion/combination/add";
+    }
+
+    /**
+     * 选择题
+     * 
+     * @return
+     */
+    @RequestMapping(value = "choice", method = RequestMethod.GET)
+    public String choiceQuestion(ModelMap model) {
+        return "combinedQuestion/choice/add";
+    }
+
+    /**
+     * 判断题
+     * 
+     * @return
+     */
+    @RequestMapping(value = "rightOrWrong", method = RequestMethod.GET)
+    public String rightOrWrongQuestion(ModelMap model) {
+        return "combinedQuestion/rightorwrong/add";
+    }
+
+    @RequestMapping(value = "{id}/remove", method = RequestMethod.GET)
+    public String removeSubQuestion(ModelMap model, @PathVariable String id,
+            @ModelAttribute("questions") List<SingleQuestion> questions, @ModelAttribute("id") String sid) {
+        for (SingleQuestion question : questions) {
+            if (question.getId().equals(id)) {
+                questions.remove(question);
+            }
+        }
+        model.addAttribute("questions", questions);
+        return "combinedQuestion/" + sid + "/edit";
+    }
+
+    /**
+     * 将接受到的参数封装成组合题
+     * 
+     * @param testQuestion
+     * @param options
+     * @param knowledges
+     * @param rightAnswer
+     * @param model
+     * @param questions
+     * @return
+     */
+    private CombinedQuestion getCombinedQuestion(CombinedQuestion testQuestion, String[] options,
+            String[] knowledges, int[] rightAnswer, ModelMap model,
+            @ModelAttribute("questions") List<SingleQuestion> questions) {
+        List<KnowledgePoint> allPoints = Lists.newArrayList();
+
+        // 对question进行封装
+        if (testQuestion.getType() != Type.COMBINATION_QUESTION) {
+            SingleQuestion question = new SingleQuestion();
+            question.setContent(testQuestion.getContent());
+            question.setDifficulty(testQuestion.getDifficulty());
+            question.setType(testQuestion.getType());
+
+            List<Answer> answers = Lists.newArrayList();
+            List<KnowledgePoint> points = Lists.newArrayList();
+
+            // 录入选项答案
+            for (int i = 0; i < options.length; i++) {
+                Answer optionalAnswer = new Answer();
+                for (int m : rightAnswer) {
+                    if (i == m - 1) {
+                        optionalAnswer.setRight(true);
+                    }
+                }
+                optionalAnswer.setContent(options[i]);
+                answers.add(optionalAnswer);
+            }
+
+            // 录入知识点
+            for (String knowledgePoint : knowledges) {
+                KnowledgePoint point = this.combinedQuestionService.findKnowledgePointById(knowledgePoint);
+                points.add(point);
+            }
+            question.setAnswers(answers);
+            question.setKnowledgePoints(points);
+            questions = Lists.newArrayList();
+            questions.add(question);
+        }
+
+        Set<String> set = new HashSet<String>();
+        int difficulty = 0;
+        for (SingleQuestion q : questions) {
+            q.setId(null);
+            difficulty += q.getDifficulty();
+            for (KnowledgePoint knowledgePoint : q.getKnowledgePoints()) {
+                set.add(knowledgePoint.getId());
+            }
+
+        }
+
+        // 定义组合题的难度为子题的平均值
+        difficulty = difficulty / questions.size();
+
+        // 知识点为子题的并集
+        Iterator<String> i = set.iterator();
+        while (i.hasNext()) {
+            KnowledgePoint point = this.combinedQuestionService.findKnowledgePointById(i.next());
+            allPoints.add(point);
+        }
+
+        testQuestion.setDifficulty(difficulty);
+        testQuestion.setKnowledgePoints(allPoints);
+        testQuestion.setQuestions(questions);
+        return testQuestion;
+    }
+
+    /**
+     * 初始化session变量
+     * 
+     * @param model
+     * @param session
+     */
+    private void InitSession(Model model, HttpSession session) {
+        model.addAttribute("content", "");
+        model.addAttribute("questions", Lists.newArrayList());
+        model.addAttribute("questionStatus", "");
+        model.addAttribute("id", "");
+    }
+
+    /**
+     * 根据类型判断返回的路径
+     * 
+     * @param type
+     * @return
+     */
+    private String getDir(Type type) {
+        String dir = "";
+        if (type == Type.COMBINATION_QUESTION) {
+            dir = "combination";
+        }
+        if (type == Type.MULTIPLE_CHOICE || type == Type.SINGLE_CHOICE) {
+            dir = "choice";
+        }
+        if (type == Type.RIGHT_OR_WRONG) {
+            dir = "rightorwrong";
+        }
+        return dir;
+    }
+}

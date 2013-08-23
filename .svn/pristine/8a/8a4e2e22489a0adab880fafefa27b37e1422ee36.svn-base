@@ -1,0 +1,125 @@
+package com.boventech.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.service.QuestionService;
+
+@Controller
+@RequestMapping(value = "/question")
+public class QuestionController {
+
+    @Autowired
+    private QuestionService questionService;
+    private static int id = 0;
+
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public String read(@PathVariable Long id) {
+        return null;
+    }
+
+	
+	@RequestMapping(method = RequestMethod.GET)
+	public String index(@RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+		return "question/index";
+	}
+
+
+    /**
+     * 前往选择题录入页面
+     * 
+     * @return
+     */
+    @RequestMapping(value = "choice", method = RequestMethod.GET)
+    public String singleQuestion(ModelMap model) {
+        return "question/choice";
+    }
+    
+    /**
+     * 前往判断题录入页面
+     * 
+     * @return
+     */
+    @RequestMapping(value = "rightOrWrong", method = RequestMethod.GET)
+    public String rightOrWrongQuestion(ModelMap model) {
+        return "question/rightOrWrong";
+    }
+
+    /**
+     * 选择题录入
+     * 
+     * @param question
+     * @param options
+     * @param rightAnswer
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "addChoice", method = RequestMethod.POST)
+    public String saveChoice(Question question, String[] options, int[] rightAnswer, ModelMap model) {
+        // 录入选项
+        for (int i = 0; i < options.length; i++) {
+            Answer optionalAnswer = new Answer();
+            optionalAnswer.setContent(options[i]);
+            question.getAnswers().add(optionalAnswer);
+        }
+
+        // 录入答案
+        Answer answer = new Answer();
+        for (int i = 0; i < rightAnswer.length; i++) {
+            String Uuid = question.getAnswers().get(rightAnswer[i] - 1).getUuidValue();
+        }
+
+        // 添加id值
+        question.setId(String.valueOf(id++));
+
+        // 将题目保存到静态数组中
+        this.questionService.save(question);
+        return "redirect:/question/questionInfo";
+    }
+    
+    @RequestMapping(value = "addRightOrWrong", method = RequestMethod.POST)
+    public String saveRightOrWrong(Question question) {
+        // 添加id值
+        question.setId(String.valueOf(id++));
+
+        // 将题目保存到静态数组中
+        this.questionService.save(question);
+        return "redirect:/question/questionInfo";
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String save(Question question) {
+        return null;
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public String destroy(@PathVariable String id) {
+        return null;
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    String update(@PathVariable String id, Question question) {
+        return null;
+    }
+
+    /**
+     * 返回到题库信息页面
+     * 
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "questionInfo", method = RequestMethod.GET)
+    public String showQuestionInfo(ModelMap model) {
+        return "questionInfo";
+    }
+    
+    
+}

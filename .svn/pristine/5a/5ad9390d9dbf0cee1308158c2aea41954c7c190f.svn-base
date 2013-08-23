@@ -1,0 +1,23 @@
+package com.boventech.demo.service;
+
+import java.util.List;
+
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.SingleQuestion;
+
+public interface SingleQuestionService {
+
+	void save(SingleQuestion question);
+
+	SingleQuestion update(SingleQuestion question);
+
+	void delete(String id);
+	
+	SingleQuestion getById(String id);
+	
+	List<SingleQuestion> randomAssignQuestions();
+	
+	KnowledgePoint findKnowledgePointById(String id);
+
+	
+}

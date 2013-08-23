@@ -1,0 +1,73 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: 59 $
+ * $Author: peng.xia $
+ * $LastChangedDate: 2013-01-30 16:12:40 +0800 (星期三, 30 一月 2013) $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "singleQuestion")
+@PrimaryKeyJoinColumn(name = "id")
+public class SingleQuestion extends BaseQuestion {
+
+    // 选项答案
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "singleQuestion_id")
+    private List<Answer> answers;
+
+    // 所包含的知识点
+    @ManyToMany(cascade = CascadeType.REFRESH)
+    @JoinTable(name = "singleQuestion_knowledgePoint", inverseJoinColumns = @JoinColumn(name = "knowledgePoint_id", referencedColumnName = "id"), joinColumns = @JoinColumn(name = "singleQuestion_id", referencedColumnName = "id"))
+    private List<KnowledgePoint> knowledgePoints;
+
+    /**
+     * @return the answers
+     */
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    /**
+     * @param answers
+     *            the answers to set
+     */
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
+    }
+
+    /**
+     * @return the knowledgePoint
+     */
+    public List<KnowledgePoint> getKnowledgePoints() {
+        return knowledgePoints;
+    }
+
+    /**
+     * @param knowledgePoint
+     *            the knowledgePoint to set
+     */
+    public void setKnowledgePoints(List<KnowledgePoint> knowledgePoints) {
+        this.knowledgePoints = knowledgePoints;
+    }
+
+}

@@ -1,0 +1,7 @@
+//添加选择题选项
+var index=3;
+function addOptions(){
+	$("#singleChoice").append("<tr><td align='right'>选项"+index+"：</td><td><input name='options' />&nbsp;&nbsp;<input name='rightAnswer' value='"+index+"' type='checkbox'/></td></tr>");
+	index++;
+}
+

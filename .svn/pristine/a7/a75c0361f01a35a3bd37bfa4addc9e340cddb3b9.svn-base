@@ -1,0 +1,70 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="r" uri="r-tag"%>
+
+<r:layout  title="QuestionBankCount">
+<ul class="breadcrumb">
+  <li><a href="<c:url value='/'/>">首页</a> <span class="divider">/</span></li>
+  <li><a href="#">试题管理</a> <span class="divider">/</span></li>
+  <li class="active">题库管理</li>
+</ul>
+	<form action="<c:url value='/questionbank' />">
+		<select id="type" name="type">
+			<option value="">请选择题目类型</option>
+			<option value="0" ${ type == "0" ? 'selected = selected' : ''}>多选题</option>
+			<option value="1" ${ type == "1" ? 'selected = selected' : ''}>单选题</option>
+			<option value="2" ${ type == "2" ? 'selected = selected' : ''}>判断题</option>
+		</select>
+		<select id="difficultyOrder" name="difficultyOrder">
+	        <option value="asc" ${ difficultyOrder == "asc" ? 'selected = selected' : ''}>难易度顺序排列</option>
+	        <option value="desc" ${ difficultyOrder == "desc" ? 'selected = selected' : ''}>难易度倒序排列</option>
+	    </select>
+		<select id="knowledgePointId" name="knowledgePointId">
+	        <option value="">请选择知识点</option>
+	        <c:forEach var="knowledgePoint" items="${knowledgePointList}">
+	        <option value="${knowledgePoint.id}" ${knowledgePoint.id == knowledgePointId ? 'selected = selected' : ''}>${knowledgePoint.content}</option>
+	        </c:forEach>
+	    </select>
+		
+		<input type="text" class="search" name="content" value="${content}" placeholder="请输入题目名称"/>
+		<button type="submit" class="btn btn-success">搜索</button>
+	</form>
+	<c:if test="${!empty questionList }">
+	<table class="table">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>题目</th>
+                    <th>类型</th>
+                    <th>难易度</th>
+                    <th>知识点</th>
+                    <th>答案</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:set var="index" value="${pageIndex.startRow}" />
+                <c:forEach var="question" items="${questionList}" varStatus="status">
+                    <tr class="${index%2==0 ? 'even' : 'odd' }">
+                        <td>${index + 1}</td>
+                        <td>${question.content}</td>
+                        <td>
+	                        <c:if test="${question.type == 'MULTIPLE_CHOICE'}">多选题</c:if>
+	                        <c:if test="${question.type == 'SINGLE_CHOICE'}">单选题</c:if>
+	                        <c:if test="${question.type == 'RIGHT_OR_WRONG'}">判断题</c:if>
+                        </td>
+                        <td>${question.difficulty}</td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <a href="<c:url value='/'/>">查看</a> | 
+                            <a href="<c:url value='/'/>">编辑</a> │ 
+                            <a href='<c:url value='/'/>' data-confirm="确定要删除吗？" data-method="delete">删除</a>
+                        </td>
+                    </tr>
+                    <c:set var="index" value="${index+1}" />
+                </c:forEach>
+            </tbody>
+        </table>
+	</c:if>
+</r:layout>

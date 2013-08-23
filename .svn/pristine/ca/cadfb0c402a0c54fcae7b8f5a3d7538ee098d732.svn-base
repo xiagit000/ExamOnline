@@ -1,0 +1,54 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.boventech.demo.dao.KnowledgePointsDao;
+import com.boventech.demo.entity.KnowledgePoint;
+
+/**
+ * @author Administrator
+ * 
+ */
+@Repository
+public class KnowledgePointsDaoImpl extends AbstractBaseDaoImpl<KnowledgePoint, String> implements
+        KnowledgePointsDao {
+
+    /*
+     * 查询所有知识点 (non-Javadoc)
+     * 
+     * @see com.boventech.demo.dao.KnowledgePointsDao#findAll()
+     */
+    @Override
+    public List<KnowledgePoint> findChild(String expression) {
+        // TODO Auto-generated method stub
+        String queryString="from KnowledgePoint where regexp(sortCode,'^"+expression+"-[0-9]*$')=1";
+        List<KnowledgePoint> list=executeQueryWithoutPaging(queryString, new Object[0]);
+        return list;
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.dao.KnowledgePointsDao#findAllParents()
+     */
+    @Override
+    public List<KnowledgePoint> findAllParents() {
+        // TODO Auto-generated method stub
+        String queryString="from KnowledgePoint where regexp(sortCode,'^[0-9]*$')=1";
+        List<KnowledgePoint> list=executeQueryWithoutPaging(queryString, new Object[0]);
+        return list;
+    }
+}

@@ -1,0 +1,388 @@
+package com.boventech.demo.util;
+
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import com.boventech.demo.entity.ChoiceQuestion;
+import com.boventech.demo.entity.Exam;
+import com.boventech.demo.entity.OptionalAnswer;
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.entity.RightOrWrongQuestion;
+import com.google.common.collect.Lists;
+
+public class DataBaseUtil {
+    // 所有题目的集合
+    public static List<Question> questionDB = Lists.newArrayList();
+    // 题库中单选题的数量
+    private int countSingleChoice;
+    // 题库中多选题的数量
+    private int countMultipleChoice;
+    // 题库中是非题的数量
+    private int countRightOrWrong;
+    // 题库中选择题的数量
+    private int countChoice;
+    // 题库中题目的总数
+    private int size;
+    // 题库中所有单选题的集合
+    private List<ChoiceQuestion> allSingleChoices = Lists.newArrayList();
+    // 题库中所有多选题的集合
+    private List<ChoiceQuestion> allMultipleChoices = Lists.newArrayList();
+    // 题库中所有是非题的集合
+    private List<RightOrWrongQuestion> allRightOrWrongChoices = Lists.newArrayList();
+    // 抽取的所有选择题（试卷）
+    List<ChoiceQuestion> randomChoices = Lists.newArrayList();
+    // 抽取的所有单选题（试卷）
+    List<RightOrWrongQuestion> randomRightOrWrongs = Lists.newArrayList();
+    // 试卷中含有选择题的数量
+    private int countRandomChoices;
+    // 试卷中所有题目的数量
+    private int totalRandomQuestions;
+
+    // 对应Exam实体类的属性，保存对试卷的设置
+    public static int singleChoiceNum;
+    public static int multipleChoiceNum;
+    public static int rightOrWrongNum;
+    public static int singleScore;
+    public static int multipleScore;
+    public static int rightOrWrongScore;
+
+    // 本套试卷的总分数
+    private int totalPoints;
+
+    public static List<Question> getQuestionDB() {
+        return questionDB;
+    }
+
+    public void save(Exam exam) {
+        DataBaseUtil.multipleChoiceNum = exam.getMultipleChoices();
+        DataBaseUtil.rightOrWrongNum = exam.getRightOrWrongs();
+        DataBaseUtil.singleChoiceNum = exam.getSingleChoices();
+        DataBaseUtil.multipleScore = exam.getMultipleScore();
+        DataBaseUtil.rightOrWrongScore = exam.getRightOrWrongScore();
+        DataBaseUtil.singleScore = exam.getSingleScore();
+    }
+
+    /**
+     * @return the singleChoiceNum
+     */
+    public int getSingleChoiceNum() {
+        return singleChoiceNum;
+    }
+
+    /**
+     * @return the multipleChoiceNum
+     */
+    public int getMultipleChoiceNum() {
+        return multipleChoiceNum;
+    }
+
+    /**
+     * @return the rightOrWrongNum
+     */
+    public int getRightOrWrongNum() {
+        return rightOrWrongNum;
+    }
+
+    /**
+     * @return the singleScore
+     */
+    public int getSingleScore() {
+        return singleScore;
+    }
+
+    /**
+     * @return the multipleScore
+     */
+    public int getMultipleScore() {
+        return multipleScore;
+    }
+
+    /**
+     * @return the rightOrWrongScore
+     */
+    public int getRightOrWrongScore() {
+        return rightOrWrongScore;
+    }
+
+    /**
+     * 试题总分数
+     * 
+     * @return the totalPoints
+     */
+    public int getTotalPoints() {
+        totalPoints = singleScore * singleChoiceNum + multipleScore * multipleChoiceNum + rightOrWrongScore
+                * rightOrWrongNum;
+        return totalPoints;
+    }
+
+    /**
+     * @throws Exception
+     * 
+     */
+    public DataBaseUtil() {
+        super();
+    }
+
+    /**
+     * 获取随机筛选出来判断题的总数
+     * 
+     * @return the countRandomChoices
+     */
+    public int getCountRandomChoices() {
+        countRandomChoices = DataBaseUtil.singleChoiceNum + DataBaseUtil.multipleChoiceNum;
+        return countRandomChoices;
+    }
+
+    /**
+     * 获取随机筛选出来所有题目的总数
+     * 
+     * @return the totalRandomQuestions
+     */
+    public int getTotalRandomQuestions() {
+        totalRandomQuestions = DataBaseUtil.singleChoiceNum + DataBaseUtil.multipleChoiceNum
+                + DataBaseUtil.rightOrWrongNum;
+        return totalRandomQuestions;
+    }
+
+    /**
+     * 判断题的数量
+     * 
+     * @return the countRightOrWrong
+     */
+    public int getCountRightOrWrong() {
+        for (Question question : questionDB) {
+            if (question instanceof RightOrWrongQuestion) {
+                countRightOrWrong++;
+            }
+        }
+        return countRightOrWrong;
+    }
+
+    /**
+     * 根据索引获取判断题
+     * 
+     * @return
+     */
+    public RightOrWrongQuestion getRightOrWrong(int index) {
+        RightOrWrongQuestion question = this.getAllRightOrWrongChoices().get(index);
+        return question;
+    }
+
+    /**
+     * 获得所有的判断题
+     * 
+     * @return the allRightOrWrongChoices
+     */
+    public List<RightOrWrongQuestion> getAllRightOrWrongChoices() {
+        for (Question question : questionDB) {
+            if (question instanceof RightOrWrongQuestion) {
+                RightOrWrongQuestion choiceQuestion = (RightOrWrongQuestion) question;
+                allRightOrWrongChoices.add(choiceQuestion);
+            }
+        }
+        return allRightOrWrongChoices;
+    }
+
+    /**
+     * 单选题的数量
+     * 
+     * @return
+     */
+    public int getCountSingleChoice() {
+        for (Question question : questionDB) {
+            if (question instanceof ChoiceQuestion) {
+                ChoiceQuestion choiceQuestion = (ChoiceQuestion) question;
+                if (choiceQuestion.getType() == ChoiceQuestion.Type.SINGLE_CHOICE) {
+                    countSingleChoice++;
+                }
+            }
+        }
+        return countSingleChoice;
+    }
+
+    /**
+     * 获取所有单选题
+     * 
+     * @return
+     */
+    public List<ChoiceQuestion> getAllSingleChoices() {
+        for (Question question : questionDB) {
+            if (question instanceof ChoiceQuestion) {
+                ChoiceQuestion choiceQuestion = (ChoiceQuestion) question;
+                if (choiceQuestion.getType() == ChoiceQuestion.Type.SINGLE_CHOICE) {
+                    allSingleChoices.add(choiceQuestion);
+                }
+            }
+        }
+        return allSingleChoices;
+    }
+
+    /**
+     * 根据索引获取单选题
+     * 
+     * @return
+     */
+    public ChoiceQuestion getSingleChoice(int index) {
+        ChoiceQuestion question = this.getAllSingleChoices().get(index);
+        return resetOptions(question);
+    }
+
+    /**
+     * 多选题的数量
+     * 
+     * @return
+     */
+    public int getCountMultipleChoice() {
+        for (Question question : questionDB) {
+            if (question instanceof ChoiceQuestion) {
+                ChoiceQuestion choiceQuestion = (ChoiceQuestion) question;
+                if (choiceQuestion.getType() == ChoiceQuestion.Type.MULTIPLE_CHOICE) {
+                    countMultipleChoice++;
+                }
+            }
+        }
+        return countMultipleChoice;
+    }
+
+    /**
+     * 获取所有多选题
+     * 
+     * @return
+     */
+    public List<ChoiceQuestion> getAllMultipleChoices() {
+        for (Question question : questionDB) {
+            if (question instanceof ChoiceQuestion) {
+                ChoiceQuestion choiceQuestion = (ChoiceQuestion) question;
+                if (choiceQuestion.getType() == ChoiceQuestion.Type.MULTIPLE_CHOICE) {
+                    allMultipleChoices.add(choiceQuestion);
+                }
+            }
+        }
+        return allMultipleChoices;
+    }
+
+    /**
+     * 根据索引获取多选题
+     * 
+     * @return
+     */
+    public ChoiceQuestion getMultipleChoice(int index) {
+        ChoiceQuestion question = this.getAllMultipleChoices().get(index);
+        return resetOptions(question);
+    }
+
+    /**
+     * 对选择题选项进行重新排序
+     * 
+     * @return
+     */
+    public ChoiceQuestion resetOptions(ChoiceQuestion question) {
+        MyRandom random = new MyRandom();
+        List<OptionalAnswer> newOptions = Lists.newArrayList();
+        LinkedHashMap<Integer, Integer> randomIndex = random.getNoRepeatRandom(question.getOptionalAnswers()
+                .size(), question.getOptionalAnswers().size());
+        Iterator<Integer> iteratorSingle = randomIndex.keySet().iterator();
+        while (iteratorSingle.hasNext()) {
+            Object key = iteratorSingle.next();
+            newOptions.add(question.getOptionalAnswers().get(randomIndex.get(key)));
+        }
+        question.setOptionalAnswers(newOptions);
+        return question;
+    }
+
+    /**
+     * 选择题总数
+     * 
+     * @return
+     */
+    public int getCountChoice() {
+        countChoice = countSingleChoice + countMultipleChoice;
+        return countChoice;
+    }
+
+    /**
+     * 题目总数
+     * 
+     * @return
+     */
+    public int getSize() {
+        size = questionDB.size();
+        return size;
+    }
+
+    /**
+     * 获取随机筛选后的选择题
+     * 
+     * @return
+     */
+    public List<ChoiceQuestion> getRandomChoices() {
+        if (randomChoices.size() == 0) {
+            this.rsetRandomChoices();
+        }
+        return randomChoices;
+    }
+
+    /**
+     * 获取随机筛选后的判断题
+     * 
+     * @return the randomRightOrWrongs
+     */
+    public List<RightOrWrongQuestion> getRandomRightOrWrongs() {
+        if (randomRightOrWrongs.size() == 0) {
+            this.resetRandomRightOrWrong();
+        }
+        return randomRightOrWrongs;
+    }
+
+    /**
+     * 随机获取选择题（重置）
+     * 
+     * @param randomChoices
+     *            the randomChoices to set
+     */
+    public void rsetRandomChoices() {
+        MyRandom random = new MyRandom();
+
+        // 随机加入单选题
+        if (singleChoiceNum != 0) {
+            LinkedHashMap<Integer, Integer> singleIndex = random.getNoRepeatRandom(
+                    this.getCountSingleChoice(), singleChoiceNum);
+            Iterator<Integer> iteratorSingle = singleIndex.keySet().iterator();
+            while (iteratorSingle.hasNext()) {
+                Object key = iteratorSingle.next();
+                randomChoices.add(this.getSingleChoice(singleIndex.get(key)));
+            }
+        }
+
+        // 随机加入多选题
+        if (multipleChoiceNum != 0) {
+            LinkedHashMap<Integer, Integer> multipleIndex = random.getNoRepeatRandom(
+                    this.getCountMultipleChoice(), multipleChoiceNum);
+            Iterator<Integer> iteratorMultiple = multipleIndex.keySet().iterator();
+            while (iteratorMultiple.hasNext()) {
+                Object key = iteratorMultiple.next();
+                randomChoices.add(this.getMultipleChoice(multipleIndex.get(key)));
+            }
+        }
+    }
+
+    /**
+     * 随机获取判断题（重置）
+     */
+    public void resetRandomRightOrWrong() {
+        MyRandom random = new MyRandom();
+
+        // 随机加入判断题
+        if (rightOrWrongNum != 0) {
+            LinkedHashMap<Integer, Integer> rightOrWrongIndex = random.getNoRepeatRandom(
+                    this.getCountRightOrWrong(), rightOrWrongNum);
+            Iterator<Integer> iteratorRightOrWrong = rightOrWrongIndex.keySet().iterator();
+            while (iteratorRightOrWrong.hasNext()) {
+                Object key = iteratorRightOrWrong.next();
+                randomRightOrWrongs.add(this.getRightOrWrong(rightOrWrongIndex.get(key)));
+            }
+        }
+    }
+
+}

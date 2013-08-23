@@ -1,0 +1,46 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.util;
+
+import java.util.LinkedHashMap;
+import java.util.Random;
+
+/**
+ * @author Administrator
+ * 
+ */
+public class MyRandom {
+    /**
+     * 在给定的范围内（0-range）,对results个随机数进行随机排序
+     * 
+     * @param range
+     * @param results
+     * @return
+     */
+    public LinkedHashMap<Integer, Integer> getNoRepeatRandom(int range, int results) {
+        Random random = new Random();
+        LinkedHashMap<Integer, Integer> noRepeatRandom = new LinkedHashMap<Integer, Integer>();
+        while (true) {
+            Integer key = new Integer(random.nextInt(range));
+            if (!noRepeatRandom.containsKey(key)) {
+                noRepeatRandom.put(key, key);
+            }
+            if (noRepeatRandom.size() == results) {
+                break;
+            }
+        }
+        return noRepeatRandom;
+    }
+
+}

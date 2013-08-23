@@ -1,0 +1,118 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.entity;
+
+/**
+ * @author Administrator
+ * 
+ */
+public class Exam {
+    private int singleChoices;
+    private int multipleChoices;
+    private int rightOrWrongs;
+    private int singleScore;
+    private int multipleScore;
+    private int rightOrWrongScore;
+
+    /**
+     * @return the singleChoices
+     */
+    public int getSingleChoices() {
+        return singleChoices;
+    }
+
+    /**
+     * @param singleChoices
+     *            the singleChoices to set
+     */
+    public void setSingleChoices(int singleChoices) {
+        this.singleChoices = singleChoices;
+    }
+
+    /**
+     * @return the multipleChoices
+     */
+    public int getMultipleChoices() {
+        return multipleChoices;
+    }
+
+    /**
+     * @param multipleChoices
+     *            the multipleChoices to set
+     */
+    public void setMultipleChoices(int multipleChoices) {
+        this.multipleChoices = multipleChoices;
+    }
+
+    /**
+     * @return the rightOrWrongs
+     */
+    public int getRightOrWrongs() {
+        return rightOrWrongs;
+    }
+
+    /**
+     * @param rightOrWrongs
+     *            the rightOrWrongs to set
+     */
+    public void setRightOrWrongs(int rightOrWrongs) {
+        this.rightOrWrongs = rightOrWrongs;
+    }
+
+    /**
+     * @return the singleScore
+     */
+    public int getSingleScore() {
+        return singleScore;
+    }
+
+    /**
+     * @param singleScore
+     *            the singleScore to set
+     */
+    public void setSingleScore(int singleScore) {
+        this.singleScore = singleScore;
+    }
+
+    /**
+     * @return the multipleScore
+     */
+    public int getMultipleScore() {
+        return multipleScore;
+    }
+
+    /**
+     * @param multipleScore
+     *            the multipleScore to set
+     */
+    public void setMultipleScore(int multipleScore) {
+        this.multipleScore = multipleScore;
+    }
+
+    /**
+     * @return the rightOrWrongScore
+     */
+    public int getRightOrWrongScore() {
+        return rightOrWrongScore;
+    }
+
+    /**
+     * @param rightOrWrongScore
+     *            the rightOrWrongScore to set
+     */
+    public void setRightOrWrongScore(int rightOrWrongScore) {
+        this.rightOrWrongScore = rightOrWrongScore;
+    }
+
+}

@@ -1,0 +1,27 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="f" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="r" uri="r-tag"%>
+<!--  
+<ul class="nav nav-list">
+  <li class="nav-header"><i class="icon-edit"></i>Menu One</li>
+  <li><a href="<c:url value='/'/>">one</a></li>
+  <li><a href="<c:url value='/'/>">two</a></li>
+  <li><a href="<c:url value='/'/>">three</a></li>
+  <li><a href="<c:url value='/'/>">four</a></li>      
+
+  <li class="nav-header"><i class="icon-globe"></i>Menu Two</li>
+  <li><a href="<c:url value='/'/>">five</a></li>
+  <li><a href="<c:url value='/'/>">six</a></li>
+  
+</ul>
+-->
+
+<ul class="nav nav-list">
+  <li class="nav-header"><i class="icon-edit"></i>在线测试</li>
+  <li><a href="<c:url value='/answer/startExam'/>">开始测试</a></li>
+  <li class="nav-header"><i class="icon-globe"></i>试题管理</li>
+  <li><a href="<c:url value='/question/add'/>">题目录入</a></li>
+  <li><a href="<c:url value='/exam'/>">试卷设置</a></li>
+  <li><a href="<c:url value='/question/questionInfo'/>">题库信息</a></li>
+</ul>

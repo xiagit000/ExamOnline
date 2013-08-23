@@ -1,0 +1,36 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.dao;
+
+import java.util.List;
+
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.TestQuestion;
+
+/**
+ * @author Administrator
+ *
+ */
+public interface TestQuestionDao extends BaseDao<TestQuestion, String>{
+    /**
+     * 组合查询
+     * @param type
+     * @param difficulty
+     * @param knowledgePointId
+     * @param content
+     * @param paging
+     * @return
+     */
+    List<TestQuestion> search(TestQuestion testQuestion,String difficultyOrder, List<KnowledgePoint> knowledgePoints,int page);
+}

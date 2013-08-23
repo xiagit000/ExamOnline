@@ -1,0 +1,45 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.service;
+
+import java.util.List;
+
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.CombinationQuestion;
+import com.boventech.demo.util.Paging;
+
+/**
+ * @author Administrator
+ * 
+ */
+public interface CombinationQuestionService {
+    void save(CombinationQuestion testQuestion);
+
+    KnowledgePoint findKnowledgePointById(String id);
+
+    /**
+     * 组合查询
+     * 
+     * @param type
+     * @param difficulty
+     * @param knowledgePointId
+     * @param content
+     * @param paging
+     * @return
+     */
+    List<CombinationQuestion> search(CombinationQuestion testQuestion, String difficultyOrder,
+            List<KnowledgePoint> knowledgePoints, Paging paging);
+
+    CombinationQuestion findById(String id);
+}

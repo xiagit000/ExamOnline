@@ -1,0 +1,25 @@
+#mysql
+jpa.databasetype=MySQL
+jpa.dialect=org.hibernate.dialect.MySQLDialect
+jdbc.driverClass=com.mysql.jdbc.Driver
+jdbc.jdbcUrl=jdbc:mysql://192.168.88.45:3306/demo?useUnicode=true&characterEncoding=UTF-8
+
+jdbc.user=state
+jdbc.password=state
+jdbc.minPoolSize=1
+jdbc.maxPoolSize=2
+jdbc.initialPoolSize=2
+jdbc.acquireIncrement=2
+jdbc.maxIdleTime=600
+jdbc.maxStatements=0
+
+#Hibernate Properties
+jpa.hbm2ddl.auto=update
+jpa.showSql=true
+jpa.generateDDL=true
+jpa.formatSql=true
+
+jdbc.testConnectionOnCheckin = true
+jdbc.automaticTestTable = c3p0TestTable
+jdbc.idleConnectionTestPeriod = 30
+jdbc.checkoutTimeout=3000

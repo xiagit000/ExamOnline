@@ -1,0 +1,151 @@
+/*
+ * Copyright 2010. 
+ * 
+ * This document may not be reproduced, distributed or used 
+ * in any manner whatsoever without the expressed written 
+ * permission of Boventech Corp. 
+ * 
+ * $Rev: Rev $
+ * $Author: Author $
+ * $LastChangedDate: LastChangedDate $
+ *
+ */
+
+package com.boventech.demo.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boventech.demo.dao.AnswerRecordDao;
+import com.boventech.demo.entity.Answer;
+import com.boventech.demo.entity.AnswerRecord;
+import com.boventech.demo.entity.Exam;
+import com.boventech.demo.entity.SingleQuestion;
+import com.boventech.demo.entity.UserAnswer;
+import com.boventech.demo.service.AnswerRecordService;
+import com.boventech.demo.service.AnswerService;
+import com.boventech.demo.service.ExamService;
+import com.boventech.demo.service.SingleQuestionService;
+import com.google.common.collect.Lists;
+
+/**
+ * @author peng.xia
+ * 
+ */
+@Service
+@Transactional
+public class AnswerRecordServiceImpl implements AnswerRecordService {
+
+    @Autowired
+    AnswerRecordDao answerRecordDao;
+
+    @Autowired
+    ExamService examService;
+
+    @Autowired
+    AnswerService answerService;
+
+    @Autowired
+    SingleQuestionService singleQuestionService;
+
+    @Override
+    public AnswerRecord getAnswerRecord(String examId, String[] questionIds, String[] answerIds) {
+        List<UserAnswer> userAnswers=Lists.newArrayList();
+        AnswerRecord answerRecord = new AnswerRecord();
+        
+
+        // 答题记录所对应的的试卷
+        Exam exam = examService.findById(examId);
+        answerRecord.setExam(exam);
+
+        // 对整个试卷的答题记录进行封装
+        for (int i = 0; i < questionIds.length; i++) {
+            List<Answer> answers=Lists.newArrayList();
+            UserAnswer userAnswer = new UserAnswer();
+            String questionId = questionIds[i];
+            SingleQuestion singleQuestion = this.singleQuestionService.getById(questionId);
+
+            // 答题记录所对应的题目
+            userAnswer.setQuestion(singleQuestion);
+
+            String[] strs = answerIds[i].split(";");
+
+            // 答题记录所对应的答题结果
+            for (String answerId : strs) {
+                Answer answer = this.answerService.findById(answerId);
+                answers.add(answer);
+            }
+            userAnswer.setAnswers(answers);
+            // 正确率
+            Double accuracy = this.getAccuracy(singleQuestion.getAnswers(), userAnswer.getAnswers());
+            userAnswer.setAccuracy(accuracy);
+  
+            userAnswers.add(userAnswer);
+        }
+        // 答题准确率
+        answerRecord.setCreateDate(new Date());
+        answerRecord.setUserAnswers(userAnswers);
+        answerRecord.setAccuracy();
+        return answerRecord;
+    }
+
+    /**
+     * 与所答题目的正确答案进行对比，获得题目的正确率
+     */
+    @Override
+    public Double getAccuracy(List<Answer> standerAnswer, List<Answer> answers) {
+        double AC = 1;
+        int count = 0;
+        for (Answer answer : standerAnswer) {
+            if (answer.isRight()) {
+                count++;
+            }
+        }
+
+        if (answers.size() > 0) {
+            for (Answer answer : answers) {
+                if (!answer.isRight()) {
+                    AC = 0;
+                }
+            }
+
+            if (AC == 1 && answers.size() < count) {
+                AC = 0.5;
+            }
+        } else {
+            AC = 0;
+        }
+
+        return AC;
+    }
+
+    @Override
+    public void save(AnswerRecord answerRecord) {
+        this.answerRecordDao.save(answerRecord);
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.AnswerRecordService#findById(java.lang.String)
+     */
+    @Override
+    public AnswerRecord findById(String id) {
+        // TODO Auto-generated method stub
+        return this.answerRecordDao.findByID(id);
+    }
+
+    /* (non-Javadoc)
+     * @see com.boventech.demo.service.AnswerRecordService#findAll(int)
+     */
+    @Override
+    public List<AnswerRecord> findAll(int page,String date,String content) {
+        // TODO Auto-generated method stub
+        return this.answerRecordDao.find(page,date,content);
+    }
+
+
+
+}

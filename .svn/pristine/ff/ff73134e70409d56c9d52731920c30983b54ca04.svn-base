@@ -1,0 +1,34 @@
+package com.boventech.demo.service;
+
+import java.util.List;
+
+import com.boventech.demo.entity.KnowledgePoint;
+import com.boventech.demo.entity.Question;
+import com.boventech.demo.util.Paging;
+
+public interface QuestionService {
+
+	void save(Question question);
+
+	Question update(Question question);
+
+	void delete(String id);
+	
+	Question getById(String id);
+	
+	List<Question> randomAssignQuestions();
+	
+	KnowledgePoint findKnowledgePointById(String id);
+
+	/**
+	 * 组合查询
+	 * @param type
+	 * @param difficulty
+	 * @param knowledgePointId
+	 * @param content
+	 * @param paging
+	 * @return
+	 */
+    List<Question> search(String type, String difficultyOrder, KnowledgePoint knowledgePoint, String content, Paging paging);
+	
+}
